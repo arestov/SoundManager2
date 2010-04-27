@@ -2003,7 +2003,9 @@ function SoundManager(smURL, smID) {
   if (document.addEventListener) {
     document.addEventListener('DOMContentLoaded', _s.domContentLoaded, false);
   }
-
+  if (document.readyState == "complete") {
+  	setTimeout(function(){ _s.domContentLoaded();},100)
+  }
 } // SoundManager()
 
 // var SM2_DEFER = true;
