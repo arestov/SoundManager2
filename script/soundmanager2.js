@@ -2586,7 +2586,7 @@ return true;
     document.addEventListener('DOMContentLoaded', _dcLoaded, false);
   }
   if (document.readyState == "complete") {
-  	setTimeout(function(){ _s.domContentLoaded();},100)
+  	setTimeout(function(){ _dcLoaded();},100)
   }
 } // SoundManager()
 
