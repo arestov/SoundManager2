@@ -2585,7 +2585,9 @@ return true;
   if (document.addEventListener) {
     document.addEventListener('DOMContentLoaded', _dcLoaded, false);
   }
-
+  if (document.readyState == "complete") {
+  	setTimeout(function(){ _s.domContentLoaded();},100)
+  }
 } // SoundManager()
 
 // var SM2_DEFER = true;
