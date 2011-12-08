@@ -84,6 +84,10 @@ code {
 	font-weight:bold;
 }
 
+p {
+	line-height:1.75em;
+}
+
 </style>
 <link rel="stylesheet" type="text/css" href="css/inlineplayer.css" />
 <link rel="stylesheet" type="text/css" href="../flashblock/flashblock.css" />
@@ -95,7 +99,7 @@ code {
 
 <div id="left">
 	
- <h1><a href="http://www.schillmania.com/projects/soundmanager2/" title="Play MP3s inline with javascript using SoundManager 2">SoundManager 2</a> / Make MP3 links play in-place</h1>
+ <h1><a href="http://www.schillmania.com/projects/soundmanager2/" title="Play MP3s inline with javascript using SoundManager 2">SoundManager 2</a> / Playable MP3 links</h1>
 
  <h2>Inline MP3 Player Example: Fancy* CSS 3 version</h2>
  <p class="note">*CSS 3 border-radius supported only by Firefox 2.x+, Safari (2.x?) - sadly, not IE 8.</p>
@@ -106,14 +110,14 @@ code {
 
  <ul class="graphic">
 
-  <li><a href="../jsAMP-preview/audio/rain.mp3">Rain</a></li>
-  <li><a href="../jsAMP-preview/audio/walking.mp3">Walking</a></li>
+  <li><a href="../_mp3/rain.mp3">Rain</a></li>
+  <li><a href="../_mp3/walking.mp3">Walking</a></li>
   <!-- files from the web (note that ID3 information will *not* load from remote domains without permission, Flash restriction) -->
   <li><a href="http://www.freshly-ground.com/misc/music/carl-3-barlp.mp3">Barrlping with Carl (featureblend.com)</a></li>
   <li><a href="http://www.freshly-ground.com/data/audio/binaural/Mak.mp3">Angry cow sound?</a></li>
   <li><a href="http://www.freshly-ground.com/data/audio/binaural/Things that open, close and roll.mp3">Things that open, close and roll</a></li>
   <li><a href="http://www.freshly-ground.com/misc/music/20060826%20-%20Armstrong.mp3">20060826 - Armstrong</a></li>
-
+  <li><a href="http://freshly-ground.com/data/video/Rain%20on%20Car%20Roof.aac">Rain On Car Roof (AAC Audio)</a></li>
  </ul>
 
  <h2>How It Works</h2>
@@ -140,8 +144,8 @@ code {
 
  <ul class="flat">
 
-  <li><a href="../jsAMP-preview/audio/going_outside.mp3">Going Outside</a></li>
-  <li><a href="../jsAMP-preview/audio/office_lobby.mp3">Office Lobby Entrance</a></li>
+  <li><a href="../_mp3/going_outside.mp3">Going Outside</a></li>
+  <li><a href="../_mp3/office_lobby.mp3">Office Lobby Entrance</a></li>
 
   <!-- files from the web (note that ID3 information will *not* load from remote domains without permission, Flash restriction) -->
 
@@ -162,9 +166,21 @@ code {
 
  </ul>
 
- <h3>Excluding or Including Links</h3>
+ <h3>Forcing play (or exclusion) of links</h3>
 
- <p>If you have a link to a PHP file that serves MP3 files eg. /music.php?fileID=123, it won't be picked up by the script as containing an .mp3 extension. To tell the script it should be treated as playable, include <code>class="inline-playable"</code> in the link - eg. <code>&lt;a href="/music.php?fileID=123" class="inline-playable"&gt;A song&lt;/a&gt;</code>. To exclude an .MP3 link from being handled by SM2, use <code>class="inline-exclude"</code> and it will be ignored.</p>
+ <p>If you have a link to a PHP file that serves MP3 files eg. /music.php?fileID=123, it won't be picked up by the script as containing a known, playable .mp3 extension. To tell the script it should be treated as playable, include a <code>type="audio/mpeg"</code> MIME type attribute, or CSS <code>class="inline-playable"</code> in the link. eg:</p>
+
+ <p>
+  <code>&lt;a href="/music.php?fileID=123" type="audio/mpeg"&gt;A song&lt;/a&gt;</code>
+ </p>
+
+ <p>Or via CSS class name:</p>
+  <code>&lt;a href="/music.php?fileID=123" class="inline-playable"&gt;A song&lt;/a&gt;</code>
+</p>
+
+ <p>
+  To exclude an .MP3 or otherwise-playable link from being handled by SM2, use <code>class="inline-exclude"</code> and it will be ignored.
+ </p>
 
  <p>
   <a href="http://www.schillmania.com/projects/soundmanager2/" title="SoundManager 2 home">SoundManager 2 project page</a> (not an MP3 link)

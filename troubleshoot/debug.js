@@ -128,7 +128,7 @@ function SM2Debugger() {
   this.doSoundTest = function() {
     var foo = soundManager.createSound({
 	  id: 'sm2TestSound',
-	  url: ('http://schillmania.com/projects/soundmanager2/demo/_mp3/mouseover.mp3')
+	  url: ('http://www.schillmania.com/projects/soundmanager2/demo/_mp3/mouseover.mp3')
     });
     if (!soundManager._disabled) {
       foo.play();
@@ -159,7 +159,11 @@ function SM2Debugger() {
     var flashVersion = fd.major+'.'+fd.minor+'.'+fd.revisionStr;
     var flashInfo = ' version '+(!isSupported?'unsupported ('+flashVersion+', SWF version '+soundManager.flashVersion+')':flashVersion);
     document.getElementById('d-flashversion').innerHTML = 'soundManager.flashVersion = '+soundManager.flashVersion+';';
-    self.handleEvent('hasflash',isSupported,hasFlash?flashInfo:null);
+    if (hasFlash) {
+      self.handleEvent('hasflash',isSupported,hasFlash?flashInfo:null);
+    } else {
+      self.handleEvent('hasflash','default',hasFlash?flashInfo:null);
+    }
   }
 
   soundManager.debugFlash = true; // try to get flash debug output, as well

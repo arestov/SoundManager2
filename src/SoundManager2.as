@@ -1,32 +1,32 @@
-/*
-   SoundManager 2: Javascript Sound for the Web
-   ----------------------------------------------
-   http://schillmania.com/projects/soundmanager2/
-
-   Copyright (c) 2007, Scott Schiller. All rights reserved.
-   Code licensed under the BSD License:
-   http://www.schillmania.com/projects/soundmanager2/license.txt
-
-   Flash 8 / ActionScript 2 version
-
-   Compiling AS to Flash 8 SWF using MTASC (free compiler - http://www.mtasc.org/):
-   mtasc -swf soundmanager2.swf -main -header 16:16:30 SoundManager2.as -version 8
-
-   ActionScript Sound class reference (Macromedia), documentation download:
-   http://livedocs.macromedia.com/flash/8/
-   Previously-live URL:
-   http://livedocs.macromedia.com/flash/8/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00002668.html
-
-   *** NOTE ON LOCAL FILE SYSTEM ACCESS ***
-
-   Flash security allows local OR network access, but not both
-   unless explicitly whitelisted/allowed by the flash player's
-   security settings.
-
-   To enable in-flash messaging for troubleshooting, pass debug=1 in FlashVars (within object/embed code)
-   SM2 will do this by default when soundManager.debugFlash = true.
-
-*/
+/**
+ * SoundManager 2: Javascript Sound for the Web
+ * ----------------------------------------------
+ * http://schillmania.com/projects/soundmanager2/
+ *
+ * Copyright (c) 2007, Scott Schiller. All rights reserved.
+ * Code licensed under the BSD License:
+ * http://www.schillmania.com/projects/soundmanager2/license.txt
+ *
+ * Flash 8 / ActionScript 2 version
+ *
+ * Compiling AS to Flash 8 SWF using MTASC (free compiler - http://www.mtasc.org/):
+ * mtasc -swf soundmanager2.swf -main -header 16:16:30 SoundManager2.as -version 8
+ *
+ * ActionScript Sound class reference (Macromedia), documentation download:
+ * http://livedocs.macromedia.com/flash/8/
+ * Previously-live URL:
+ * http://livedocs.macromedia.com/flash/8/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00002668.html
+ *
+ * *** NOTE ON LOCAL FILE SYSTEM ACCESS ***
+ *
+ * Flash security allows local OR network access, but not both
+ * unless explicitly whitelisted/allowed by the flash player's
+ * security settings.
+ *
+ * To enable in-flash messaging for troubleshooting, pass debug=1 in FlashVars (within object/embed code)
+ * SM2 will do this by default when soundManager.debugFlash = true.
+ *
+ */
 
 import flash.external.ExternalInterface; // woo
 
@@ -36,13 +36,28 @@ class SoundManager2 {
 
   function SoundManager2() {
 
-    var version = "2.95b.20100323";
+    var version = "V2.97a.20111030";
     var version_as = "(AS2/Flash 8)";
 
-    // Cross-domain security exception shiz
-    // HTML on foo.com loading .swf hosted on bar.com? Define your "HTML domain" here to allow JS+Flash communication to work.
-    // See http://livedocs.adobe.com/flash/8/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00002647.html
-    // System.security.allowDomain("foo.com");
+    /**
+     *  Cross-domain security options
+     *  HTML on foo.com loading .swf hosted on bar.com? Define your "HTML domain" here to allow JS+Flash communication to work.
+     *  // allow_xdomain_scripting = true;
+     *  // xdomain = "foo.com";
+     *  For all domains (possible security risk?), use xdomain = "*"; which ends up as System.security.allowDomain("*");
+     *  When loading from HTTPS, use System.security.allowInsecureDomain();
+     *  See "allowDomain (security.allowDomain method)" in Flash 8/AS2 liveDocs documentation (AS2 reference -> classes -> security)
+     *  download from http://livedocs.macromedia.com/flash/8/
+     *  Related AS3 documentation: http://livedocs.adobe.com/flash/9.0/ActionScriptLangRefV3/flash/system/Security.html#allowDomain%28%29
+     */
+
+    var allow_xdomain_scripting = false;
+    var xdomain = "*";
+
+    if (allow_xdomain_scripting && xdomain) {
+      System.security.allowDomain(xdomain);
+      version_as += ' - cross-domain enabled';
+    }
 
     // externalInterface references (for Javascript callbacks)
     var baseJSController = "soundManager";
@@ -52,7 +67,6 @@ class SoundManager2 {
     var sounds = []; // indexed string array
     var soundObjects = []; // associative Sound() object array
     var timer = null;
-    var timerInterval = 20;
     var pollingEnabled = false; // polling (timer) flag - disabled by default, enabled by JS->Flash call
     var debugEnabled = true; // Flash debug output enabled by default, disabled by JS call
     var flashDebugEnabled = false; // debug output to flash movie, off by default
@@ -68,12 +82,25 @@ class SoundManager2 {
     Stage.scaleMode = 'noScale';
     Stage.align = 'TL';
 
-    var writeDebug = function (s) {
+    // context menu item with version info
+
+    var doNothing = function() {}
+
+    var sm2Menu:ContextMenu = new ContextMenu();
+    var sm2MenuItem:ContextMenuItem = new ContextMenuItem('SoundManager ' + version + ' ' + version_as, doNothing);
+    sm2MenuItem.enabled = false;
+    sm2Menu.customItems.push(sm2MenuItem);
+    _root.menu = sm2Menu;
+
+    var writeDebug = function(s) {
+      // <d>
       if (!debugEnabled) return false;
       ExternalInterface.call(baseJSController + "['_writeDebug']", "(Flash): " + s);
+      // </d>
     }
 
-    var flashDebug = function (messageText) {
+    var flashDebug = function(messageText) {
+      // <d>
       _messages.push(messageText);
       if (!flashDebugEnabled) {
         return false;
@@ -82,10 +109,9 @@ class SoundManager2 {
       sans.size = 12;
       sans.font = "Arial";
 
-	  // 320x240 if no stage dimensions (happens in IE, apparently 0 before stage resize event fires.)
-	  var w = Stage.width?Stage.width:320;
-	  var h = Stage.height?Stage.height:240;
-
+      // 320x240 if no stage dimensions (happens in IE, apparently 0 before stage resize event fires.)
+      var w = Stage.width?Stage.width:320;
+      var h = Stage.height?Stage.height:240;
       if (!_messageObj) {
         _messageObj = _root.createTextField("_messageObj", 0, 0, 0, w, h);
         _messageObj.x = 0;
@@ -100,16 +126,17 @@ class SoundManager2 {
       _messageObj.setTextFormat(sans);
       _messageObj.width = w;
       _messageObj.height = h;
+      // </d>
     }
 
-    var _externalInterfaceTest = function (isFirstCall) {
+    var _externalInterfaceTest = function(isFirstCall) {
       var sandboxType = System.security['sandboxType'];
       try {
         if (isFirstCall) {
           flashDebug('Testing Flash -&gt; JS...')
           if (!didSandboxMessage && sandboxType != 'remote' && sandboxType != 'localTrusted') {
             didSandboxMessage = true;
-            flashDebug('<br><b>Fatal: Security sandbox error: Got "' + sandboxType + '", expected "remote" or "localTrusted".<br>Additional security permissions need to be granted.<br>See <a href="http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html">flash security settings panel</a> for non-HTTP, eg. file:// use.</b><br>http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html');
+            flashDebug('<br><b>Fatal: Security sandbox error: Got "' + sandboxType + '", expected "remote" or "localTrusted".<br>Additional security permissions need to be granted.<br>See <a href="http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html">flash security settings panel</a> for non-HTTP, eg. file:// use.</b><br>http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html<br><br>You may also be able to right-click this movie and choose from the menu: <br>"Global Settings" -> "Advanced" tab -> "Trusted Location Settings"<br>');
           }
           var d = new Date();
           ExternalInterface.call(baseJSController + "._externalInterfaceOK", d.getTime());
@@ -117,7 +144,7 @@ class SoundManager2 {
             flashDebug('Flash -&gt; JS OK');
           }
         } else {
-          writeDebug('SM2 SWF V' + version + ' ' + version_as);
+          writeDebug('SM2 SWF ' + version + ' ' + version_as);
           flashDebug('JS -&gt; Flash OK');
           writeDebug('JS to/from Flash OK');
           ExternalInterface.call(baseJSController + "._setSandboxType", sandboxType);
@@ -132,13 +159,13 @@ class SoundManager2 {
       return true; // to verify that a call from JS to here, works. (eg. JS receives "true", thus OK.)
     }
 
-    var _disableDebug = function () {
+    var _disableDebug = function() {
       // prevent future debug calls from Flash going to client (maybe improve performance)
       writeDebug('_disableDebug()');
       debugEnabled = false;
     }
 
-    var checkProgress = function () {
+    var checkProgress = function() {
       var bL = 0;
       var bT = 0;
       var nD = 0;
@@ -158,23 +185,18 @@ class SoundManager2 {
           oSound.lastValues.position = nP;
           ExternalInterface.call(baseJSObject + "['" + oSound.sID + "']._whileplaying", nP);
           // if position changed, check for near-end
-          if (oSound.didJustBeforeFinish != true && oSound.loaded == true && oSound.justBeforeFinishOffset > 0 && nD - nP <= oSound.justBeforeFinishOffset) {
-            // fully-loaded, near end and haven't done this yet..
-            ExternalInterface.call(baseJSObject + "['" + oSound.sID + "']._onjustbeforefinish", (nD - nP));
-            oSound.didJustBeforeFinish = true;
-          }
         }
       }
     }
 
-    var onLoad = function (bSuccess) {
+    var onLoad = function(bSuccess) {
       checkProgress(); // ensure progress stats are up-to-date
       // force duration update (doesn't seem to be always accurate)
       ExternalInterface.call(baseJSObject + "['" + this.sID + "']._whileloading", this.getBytesLoaded(), this.getBytesTotal(), this.duration);
       ExternalInterface.call(baseJSObject + "['" + this.sID + "']._onload", this.duration > 0 ? 1 : 0); // bSuccess doesn't always seem to work, so check MP3 duration instead.
     }
 
-    var onID3 = function () {
+    var onID3 = function() {
       // --- NOTE: BUGGY? ---
       // --------------------
       // TODO: Investigate holes in ID3 parsing - for some reason, Album will be populated with Date if empty and date is provided. (?)
@@ -194,26 +216,38 @@ class SoundManager2 {
       soundObjects[this.sID].onID3 = null;
     }
 
-    var registerOnComplete = function (sID) {
-      soundObjects[sID].onSoundComplete = function () {
+    var registerOnComplete = function(sID) {
+      soundObjects[sID].onSoundComplete = function() {
         checkProgress();
-        this.didJustBeforeFinish = false; // reset
         ExternalInterface.call(baseJSObject + "['" + sID + "']._onfinish");
       }
     }
 
-    var _setPosition = function (sID, nSecOffset, isPaused) {
+    var _setPosition = function(sID, nSecOffset, isPaused) {
       var s = soundObjects[sID];
       // writeDebug('_setPosition()');
       s.lastValues.position = s.position;
+      if (s.lastValues.loops > 1 && nSecOffset != 0) {
+        writeDebug('Warning: Looping functionality being disabled due to Flash limitation.');
+        s.lastValues.loops = 1;
+      }
       s.start(nSecOffset, s.lastValues.nLoops || 1); // start playing at new position
-      if (isPaused) s.stop();
+      if (isPaused) {
+        s.stop();
+      }
     }
 
-    var _load = function (sID, sURL, bStream, bAutoPlay) {
+    var _load = function(sID, sURL, bStream, bAutoPlay, bCheckPolicyFile) {
       // writeDebug('_load(): '+sID+', '+sURL+', '+bStream+', '+bAutoPlay);
-      if (typeof bAutoPlay == 'undefined') bAutoPlay = false;
-      if (typeof bStream == 'undefined') bStream = true;
+      if (typeof bAutoPlay == 'undefined') {
+        bAutoPlay = false;
+      }
+      if (typeof bStream == 'undefined') {
+        bStream = true;
+      }
+      if (typeof bCheckPolicyFile == 'undefined') {
+        bCheckPolicyFile = false;
+      }
       // writeDebug('bStream: '+bStream);
       // writeDebug('bAutoPlay: '+bAutoPlay);
       // checkProgress();
@@ -221,8 +255,8 @@ class SoundManager2 {
       s.onID3 = onID3;
       s.onLoad = onLoad;
       s.loaded = true;
+      s.checkPolicyFile = bCheckPolicyFile;
       s.loadSound(sURL, bStream);
-      s.didJustBeforeFinish = false;
       if (bAutoPlay != true) {
         s.stop(); // prevent default auto-play behaviour
       } else {
@@ -231,61 +265,64 @@ class SoundManager2 {
       registerOnComplete(sID);
     }
 
-    var _unload = function (sID, sURL) {
+    var _unload = function(sID, sURL) {
       // effectively "stop" loading by loading a tiny MP3
-      // writeDebug('_unload()');
       var s = soundObjects[sID];
       s.onID3 = null;
       s.onLoad = null;
       s.loaded = false;
+      // ensure position is reset, if unload fails
+      s.start(0,1);
+      s.stop();
       s.loadSound(sURL, true);
       s.stop(); // prevent auto-play
-      s.didJustBeforeFinish = false;
     }
 
-    var _createSound = function (sID, justBeforeFinishOffset) {
-      soundObjects[sID] = new Sound();
-      var s = soundObjects[sID];
+    var _createSound = function(sID, loops, checkPolicyFile) {
+      var s = new Sound();
+      if (!soundObjects[sID]) {
+        sounds.push(sID);
+      }
+      soundObjects[sID] = s;
       s.setVolume(100);
-      s.didJustBeforeFinish = false;
       s.sID = sID;
       s.paused = false;
       s.loaded = false;
-      s.justBeforeFinishOffset = justBeforeFinishOffset || 0;
+      s.checkPolicyFile = checkPolicyFile;
       s.lastValues = {
         bytes: 0,
         position: 0,
-        nLoops: 1
+        nLoops: loops||1
       };
-      sounds.push(sID);
     }
 
-    var _destroySound = function (sID) {
+    var _destroySound = function(sID) {
       // for the power of garbage collection! .. er, Greyskull!
       var s = (soundObjects[sID] || null);
-      if (!s) return false;
+      if (!s) {
+        return false;
+      }
       for (var i = 0; i < sounds.length; i++) {
-        if (sounds[i] == s) {
+        if (sounds[i] == sID) {
           sounds.splice(i, 1);
-          continue;
+          break;
         }
       }
       s = null;
       delete soundObjects[sID];
     }
 
-    var _stop = function (sID, bStopAll) {
+    var _stop = function(sID, bStopAll) {
       // stop this particular instance (or "all", based on parameter)
       if (bStopAll) {
         _root.stop();
       } else {
         soundObjects[sID].stop();
         soundObjects[sID].paused = false;
-        soundObjects[sID].didJustBeforeFinish = false;
       }
     }
 
-    var _start = function (sID, nLoops, nMsecOffset) {
+    var _start = function(sID, nLoops, nMsecOffset) {
       // writeDebug('_start: ' + sID + ', loops: ' + nLoops + ', nMsecOffset: ' + nMsecOffset);
       registerOnComplete();
       var s = soundObjects[sID];
@@ -294,7 +331,7 @@ class SoundManager2 {
       s.start(nMsecOffset, nLoops);
     }
 
-    var _pause = function (sID) {
+    var _pause = function(sID) {
       // writeDebug('_pause()');
       var s = soundObjects[sID];
       if (!s.paused) {
@@ -311,15 +348,18 @@ class SoundManager2 {
       }
     }
 
-    var _setPan = function (sID, nPan) {
+    var _setPan = function(sID, nPan) {
       soundObjects[sID].setPan(nPan);
     }
 
-    var _setVolume = function (sID, nVol) {
+    var _setVolume = function(sID, nVol) {
       soundObjects[sID].setVolume(nVol);
     }
 
-    var _setPolling = function (bPolling) {
+    var _setPolling = function(bPolling, timerInterval) {
+      if (typeof timerInterval === 'undefined') {
+        timerInterval = 50;
+      }
       pollingEnabled = bPolling;
       if (timer == null && pollingEnabled) {
         writeDebug('Enabling polling, ' + timerInterval + ' ms interval');
@@ -331,47 +371,7 @@ class SoundManager2 {
       }
     }
 
-    // XML handler stuff
-    var parseXML = function (oXML) {
-      // trace("Parsing XML");
-      var xmlRoot = oXML.firstChild;
-      var xmlAttr = xmlRoot.attributes;
-      var oOptions = {};
-      for (var i = 0, j = xmlRoot.childNodes.length; i < j; i++) {
-        xmlAttr = xmlRoot.childNodes[i].attributes;
-        oOptions = {
-          id: xmlAttr.id,
-          url: xmlRoot.attributes.baseHref + xmlAttr.href,
-          stream: xmlAttr.stream
-        }
-        ExternalInterface.call(baseJSController + ".createSound", oOptions);
-      }
-    }
-
-    var xmlOnloadHandler = function (ok) {
-      if (ok) {
-        // trace("XML loaded.");
-        writeDebug("XML loaded");
-        parseXML(this);
-      } else {
-        // trace("XML load failed.");
-        writeDebug('XML load failed');
-      }
-    }
-
-    // ---
-    var _loadFromXML = function (sXmlUrl) {
-      writeDebug("_loadFromXML(" + sXmlUrl + ")");
-      // ExternalInterface.call(baseJSController+"._writeDebug","_loadFromXML("+sXmlUrl+")");
-      // var oXmlHandler = new XMLHandler(sXmlUrl);
-      var oXML = new XML();
-      oXML.ignoreWhite = true;
-      oXML.onLoad = xmlOnloadHandler;
-      writeDebug("Attempting to load XML: " + sXmlUrl);
-      oXML.load(sXmlUrl);
-    }
-
-    var _init = function () {
+    var _init = function() {
 
       // OK now stuff should be available
       try {
@@ -387,7 +387,6 @@ class SoundManager2 {
         ExternalInterface.addCallback('_setPolling', this, _setPolling);
         ExternalInterface.addCallback('_externalInterfaceTest', this, _externalInterfaceTest);
         ExternalInterface.addCallback('_disableDebug', this, _disableDebug);
-        ExternalInterface.addCallback('_loadFromXML', null, _loadFromXML);
         ExternalInterface.addCallback('_createSound', this, _createSound);
         ExternalInterface.addCallback('_destroySound', this, _destroySound);
       } catch(e) {
@@ -398,7 +397,7 @@ class SoundManager2 {
       // flashDebug('Init OK');
     }
 
-    flashDebug('SM2 SWF V' + version + ' ' + version_as);
+    flashDebug('SM2 SWF ' + version + ' ' + version_as);
 
     if (ExternalInterface.available) {
       flashDebug('ExternalInterface available');

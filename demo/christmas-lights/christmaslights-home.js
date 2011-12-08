@@ -43,7 +43,7 @@ function XLSF(oTarget,urlBase,lightClass) {
     var screenY = (document.documentElement.clientHeight||document.body.clientHeight||document.body.scrollHeight);
   }
 
-  this.lightClass = (screenX>1280?'small':'pico'); // kind of light to show (32px to 96px square)
+  this.lightClass = (screenX>1600?'small':'pico'); // kind of light to show (32px to 96px square)
 
   if (typeof lightClass != 'undefined') {
 	// hack: override
@@ -64,7 +64,7 @@ function XLSF(oTarget,urlBase,lightClass) {
   }
   this.lightSmashCounter = 0;
   this.lightIndex = 0;
-  this.lightInterval = 250;
+  this.lightInterval = 500;
   this.timer = null;
   this.bgBaseX = 0;
   this.bgBaseY = 0;
@@ -326,7 +326,7 @@ function XLSF(oTarget,urlBase,lightClass) {
     this.smash = function(e) {
       if (self.broken) return false;
       self.broken = true;
-      if (soundManager && soundManager._didInit && !soundManager._disabled) {
+      if (soundManager && soundManager.supported()) {
         soundManager.play(self.soundID,{pan:self.pan});
         // soundManager.sounds[self.soundID].play({pan:self.pan});
         // if (self.bonusSound != null) window.setTimeout(self.smashBonus,1000);
@@ -392,7 +392,7 @@ function XLSF(oTarget,urlBase,lightClass) {
 
   
   this.destroyLights = function() {
-    self.startSequence(self.destroyLight,20);    
+    self.startSequence(self.destroyLight,20);
   }
 
   this.destroyLight = function() {
@@ -508,17 +508,3 @@ function smashInit(urlBase,lightClass) {
   xlsf.initSounds();
   // document.getElementById('loading').style.display = 'none';
 }
-
-/*
-soundManager.flashVersion = 9;
-soundManager.debugMode = false;
-// soundManager._disabled = true;
-
-soundManager.onload = function() {
-  setTimeout(smashInit,500);
-}
-
-soundManager.onerror = function() {
-  setTimeout(smashInit,500);
-}
-*/

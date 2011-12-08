@@ -50,7 +50,7 @@ p {
  overflow:auto;
  padding:0px;
  margin:1em;
- font-family:monaco,"VT-100",terminal,"lucida console",courier,system;
+ font-family:monaco,"VT-100","lucida console",courier,system;
  opacity:0.9;
  color:#333;
  border:1px solid #ccddee;
@@ -79,6 +79,7 @@ p {
 
 // flash version URL switch (for this demo page)
 var winLoc = window.location.toString();
+soundManager.preferFlash = (winLoc.match(/usehtml5audio=1/i) ? false : true);
 if (winLoc.match(/flash9/i)) {
   soundManager.flashVersion = 9;
   if (winLoc.match(/highperformance/i)) {
@@ -134,7 +135,12 @@ soundManager.onready(function(oStatus) {
 
 function checkRAM() {
   if (soundManager.supported()) {
-    document.getElementById('flash-ram-use').innerHTML = (soundManager.getMemoryUse()/1024/1024).toFixed(2)+' MB';
+	var ram = (soundManager.getMemoryUse()/1024/1024).toFixed(2);
+    if (!isNaN(ram)) {
+      document.getElementById('flash-ram-use').innerHTML = ram+' MB';
+    } else {
+	  document.getElementById('flash-ram-use').style.display = 'none';
+    }
   }
 }
 
@@ -161,11 +167,11 @@ function getRandomMP3URL() {
 
  <h1><a href="http://www.schillmania.com/projects/soundmanager2/" style="color:#000;text-decoration:none">SoundManager 2</a> / API Demo and Code Examples</h1>
 
- <p class="note">You can run the API demos with <a href="#flash8" onclick="window.location.replace(this.href);window.location.reload()">Flash 8</a> (default), <a href="#flash9" onclick="window.location.replace(this.href);window.location.reload()">Flash 9</a> (normal) or <a href="#flash9-highperformance" onclick="window.location.replace(this.href);window.location.reload()">Flash 9 + highPerformance + fastPolling</a> modes (higher JS callback frequency).</p>
+ <p class="note">You can run the API demos with <a href="#sm2-usehtml5audio=1" onclick="window.location.replace(this.href);window.location.reload()">HTML5</a> enabled, <a href="#flash8" onclick="window.location.replace(this.href);window.location.reload()">Flash 8</a> (API default), <a href="#flash9" onclick="window.location.replace(this.href);window.location.reload()">Flash 9</a> (normal) or <a href="#flash9-highperformance" onclick="window.location.replace(this.href);window.location.reload()">Flash 9 + highPerformance + fastPolling</a> modes (higher JS callback frequency).</p>
 
  <p>Wondering where to start? This page has inline executable code examples using the SoundManager 2 API.</p>
 
- <p>If you're wondering <em>"How to include SM2 in my page?"</em>, the <a href="../template/" title="SoundManager 2 bare-bones template" onclick="if (!document.domain) this.href=this.href+'index.html'">basic template</a> will get you started.</p>
+ <p>If you're wondering <em>"How to include SM2 in my page?"</em>, the <a href="../template/" title="SoundManager 2 bare-bones template" onclick="if (!document.domain && !this.href.match(/index/i)) this.href=this.href+'index.html'">basic template</a> will get you started.</p>
 
  <div id="sm2-container">
    <!-- flash is appended here -->
@@ -191,27 +197,18 @@ soundManager.onerror = function() {
  <p>You can register listeners by passing a function to <code>onready()</code>, and it will be called when SoundManager has finished starting up:</p>
 
 <pre class="block"><code>soundManager.onready(function() {<span>
-  if (soundManager.supported()) {
     <span>// createSound() / play() etc. can now be called</span>
-  } else {
-    <span>// uh-oh, SM2 failed to start - error, unsupported etc.</span>
-  }
 </span>});
 </code></pre>
 
- <p>An optional status object is actually passed to your onready() listener, which you can use instead of checking <code>soundManager.supported()</code>:</p>
+ <p>You may also listen for a startup timeout, a form of failure (eg., Flash was required, but was blocked from loading etc.):</p>
 
-<pre class="block"><code>soundManager.onready(function(oStatus) {
-  <span><span>// oStatus: object containing "success" parameter</span>
-  if (oStatus.success) {
-    <span>// createSound() / play() etc. can now be called</span>
-  } else {
+<pre class="block"><code>soundManager.ontimeout(function() {<span>
     <span>// uh-oh, SM2 failed to start - error, unsupported etc.</span>
-  }
 </span>});
 </code></pre>
 
-<p>SoundManager first processes the <code>onready</code> queue in the order items were added, and then fires <code>soundManager.onload()</code> or <code>onerror()</code>. If you call <code>onready()</code> after SM2 has loaded, your callback will be fired immediately.</p>
+<p>SoundManager first processes the <code>onready</code> or <code>ontimeout</code> queue in the order items were added, and then fires <code>soundManager.onload()</code> or <code>onerror()</code>. If you call <code>onready()</code> after SM2 has loaded, your callback will be fired immediately.</p>
 
  <h2>A note about initialization</h2>
  
@@ -297,22 +294,69 @@ soundManager.play('<span>aRimSound</span>');</code></pre>
  <p>This will crate and play a new sound, using the "onfinish" handler to create and play a second, new sound.</p>
  <p>It is recommended to create sound objects first, to simplify troubleshooting.</p>
 
-<h2 id="looping">Demo 4c: Looping a sound</h2>
+<h2 id="looping-conventional">Demo 4c: Looping a sound (conventional, onfinish()-based)</h2>
 <pre id="demo4c" class="block"><code>var s = soundManager.createSound({
   id:'<span>hhCymbal</span>',
   url:'<span>../mpc/audio/AMB_HHOP.mp3</span>'
 });
 
+function loopSound(sound) {
+  sound.play({
+    onfinish: function() {
+      loopSound(sound);
+    }
+  });
+}
+
+loopSound(s);
+</code></pre>
+
+<button onclick="return doEval(document.getElementById('demo4c').innerHTML);return false">Do this</button> | <button onclick="soundManager.stop('hhCymbal')">make it stop!</button>
+<p>Note that there are issues with seamlessly-looping sounds, it is "close, but not perfect" with Flash 8/9 at this point.</p>
+
+<h2 id="looping">Demo 4d: Looping a sound ("loops" parameter method)</h2>
+<pre id="demo4d" class="block"><code>var s = soundManager.createSound({
+  id:'<span>hhCymbal</span>',
+  url:'<span>../mpc/audio/AMB_HHOP.mp3</span>'
+});
+
 s.play({
-  onfinish: function() {
-    this.play();
-    <span><span>// or, soundManager.play('<span>hhCymbal</span>');</span></span>
+  loops: 3
+});
+</code></pre>
+
+<button onclick="return doEval(document.getElementById('demo4d').innerHTML);return false">Do this</button> | <button onclick="soundManager.stop('hhCymbal')">make it stop!</button>
+<p>Looping is possible as shown above using Flash 9. <b>With flash 8, the sound must be preloaded before looping can begin</b> - eg. <code>autoLoad: true, onload: function() { this.play{loops:3} }</code>. For tighter looping, see See <a href="http://www.flickr.com/photos/schill/4499319436/" title="Seamless looping MP3 sounds in Flash">Seamless Looping MP3 in Flash</a> for further details.</p>
+
+
+<h2 id="onposition">Demo 4e: Sound timing notifications using onposition()</h2>
+<pre id="demo4e" class="block"><code>var s = soundManager.getSoundById('<span>aCymbalSound</span>'); <span><span>// existing sound object</span></span>
+
+<span><span>// register some listeners (only do this once, they will work for subsequent plays)</span></span>
+
+if (typeof addedListeners === '<span>undefined</span>') {
+  addedListeners = true;
+
+  s.onposition(<span>500</span>, function(eventPosition) { <span><span>// fire at 0.5 seconds</span></span>
+    soundManager._writeDebug(<span>'Sound '+this.sID+' has reached position '+eventPosition</span>);
+  });
+
+  s.onposition(<span>1000</span>, function(eventPosition) {<span><span>// fire at 1 second</span></span>
+    soundManager._writeDebug(<span>'Sound '+this.sID+' has reached position '+eventPosition</span>);
+  });
+}
+
+s.play({
+  whileplaying:function() {
+    <span><span>// demo only: show sound position while playing, for context</span></span>
+    soundManager._writeDebug('position = ' + this.position);
   }
 });
 </code></pre>
 
-<button onclick="return doEval(document.getElementById('demo4c').innerHTML);return false">Do this</button> | <button onclick="soundManager.stop('hhCymbal')">make it stop!</button>
-<p>Note that there are issues with seamlessly-looping sounds, effectively it is not possible with Flash 8/9 at this point. You can try to get creative with <i>onbeforefinish</i> and timing, but it is difficult if not impractical.</p>
+<button onclick="return doEval(document.getElementById('demo4e').innerHTML);return false">Do this</button>
+<p>onposition() allows you to add an event listener for a given time (in miliseconds, watching the position property); the event fires when that time has been reached while a sound is playing.</p>
+<p>Note that for multiShot cases, the listeners will only fire for the original (first) shot because its position is the only one that is tracked within Flash.</p>
  
 <h2>Demo 5a: Set sound parameters, then play</h2>
 <pre class="block"><code>var sound = soundManager.getSoundById('<span>chinaCymbal</span>'); <span><span>// predefined/preloaded sound</span></span>

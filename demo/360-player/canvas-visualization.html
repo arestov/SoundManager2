@@ -50,8 +50,20 @@ if (threeSixtyPlayer.config.usePeakData) {
   soundManager.flash9Options.usePeakData = true;
 }
 
-// include the favicon, why not.
-threeSixtyPlayer.config.useFavIcon = true;
+if (threeSixtyPlayer.config.useWaveformData || threeSixtyPlayer.flash9Options.useEQData || threeSixtyPlayer.flash9Options.usePeakData) {
+  // even if HTML5 supports MP3, prefer flash so the visualization features can be used.
+  soundManager.preferFlash = true;
+}
+
+// favicon is expensive CPU-wise, but can be used.
+if (window.location.href.match(/hifi/i)) {
+  threeSixtyPlayer.config.useFavIcon = true;
+}
+
+if (window.location.href.match(/html5/i)) {
+  // for testing IE 9, etc.
+  soundManager.useHTML5Audio = true;
+}
 
 </script>
 
@@ -85,6 +97,10 @@ pre.block {
  max-width:100%;
 }
 
+.ui360 span {
+ vertical-align: top;
+}
+
 </style>
 
 <!-- demo configuration stuff, you don't need this -->
@@ -99,7 +115,7 @@ pre.block {
 
  <h1><a href="http://www.schillmania.com/projects/soundmanager2/" title="Javascript MP3 player project home">SoundManager 2</a> / <a href="http://schillmania.com/projects/soundmanager2/demo/360-player/">360&deg; Player Demo</a>: JS + Canvas Visualization</h1>
 
- <p class="note" style="color:#666;margin-bottom:0.5em">Canvas-based UI with visualization options. <b>Note: Beta-ish code. Spectrum/EQ visualizations disabled for IE due to low performance.</b></p>
+ <p class="note" style="color:#666;margin-top:0.5em;margin-bottom:0.5em">Canvas-based UI with visualization options. <b>Note: Spectrum/EQ visualizations disabled for IE &lt; 9 (too slow.) Data is not implemented under HTML5.</b></p>
  <p class="note" style="color:#666;margin-bottom:0.5em">You can also <a href="#debug=1" onclick="window.location.href = this.href;window.location.reload()" title="Enable debug mode, show frames per second">show FPS</a><span id="config-link"> or <a href="#customize" onclick="window.location.href=this.href;window.location.reload()">customize the UI</a></span><span id="hifi">, or see the <a href="#hifi=1" onclick="window.location.href=this.href;window.location.reload()">hi-fi version</a></span>. Check the <a href="canvas-visualization-basic.html">basic template</a> for a minimal code example; also see the <a href="../360-player/" title="360&deg; player UI">default 360&deg; UI</a>.</p>
 
 	<!-- customization crap -->
@@ -145,7 +161,7 @@ pre.block {
 			   <dd>1-16</dd>
 			   <dd class="control">
 			    <div class="bar" title="Click to move here"></div>
-			    <div class="slider" title="Primary (inner circle) colour"></div>
+			    <div class="slider" title="Amount to downsample waveform data by"></div>
 			   </dd>
 
 			   <dt>EQ Thickness</dt>
@@ -161,7 +177,7 @@ pre.block {
 			   <dd>1-16</dd>
 			   <dd class="control">
 			    <div class="bar" title="Click to move here"></div>
-			    <div class="slider" title="Primary (inner circle) colour"></div>
+			    <div class="slider" title="Amount to downsample EQ data by"></div>
 			   </dd>
 
 			  </dl>
@@ -222,7 +238,7 @@ pre.block {
 	<pre id="config-pre-block" class="block"><code id="config-code">Code goes here</code></pre>
 		  </div>
 
-		</div>
+		 </div>
 
 		</div>
 		
@@ -239,23 +255,27 @@ pre.block {
 	 	<h2 style="margin-top:1em">Inline list</h2>
 
 		<div class="sm2-inline-list"> <!-- remove this class to have one item per line -->
-			
-		<div class="ui360"><a href="http://freshly-ground.com/data/audio/mpc/20060826%20-%20Armstrong.mp3">20060826 - Armstrong Groove</a></div>
-		<div class="ui360"><a href="http://freshly-ground.com/data/audio/mpc/20090119%20-%20Untitled%20Groove.mp3">20090119 - Untitled Groove</a></div>
-		<div class="ui360"><a href="../../demo/_mp3/sine,%20square,%20sawtooth,%20rando.mp3">Sine, Square, Sawtooth, Wave (Warning: <span style="color:#ff3333">LOUD</span>)</a></div>
-	     	<div class="ui360"><a href="http://freshly-ground.com/data/audio/mpc/20090207%20-%20Loverman.mp3">20090207 - Loverman</a></div>
 
-	    	</div>
+			<div class="ui360 ui360-vis"><a href="http://freshly-ground.com/data/audio/sm2/Adrian%20Glynn%20-%20Blue%20Belle%20Lament.mp3">Adrian Glynn - Blue Belle Lament</a></div>
+			<div class="ui360 ui360-vis"><a href="http://freshly-ground.com/data/audio/sm2/SonReal%20-%20I%20Tried.mp3">SonReal - I Tried</a></div>
+			<div class="ui360 ui360-vis"><a href="http://freshly-ground.com/data/audio/sm2/SonReal%20-%20People%20Asking.mp3">SonReal - People Asking</a></div>
+			<div class="ui360 ui360-vis"><a href="http://freshly-ground.com/data/audio/mpc/20060826%20-%20Armstrong.mp3">20060826 - Armstrong Groove</a></div>
+
+	   	</div>
+	
+		<p class="note medium-note" style="clear:both"><b>Artist thank-yous</b>: "Blue Belle Lament" courtesy of <a href="http://www.adrianglynn.com/" title="Adrian Glynn, Vancouver-based Singer/Songwriter">Adrian Glynn</a>. "I Tried" and "People Asking" courtesy of <a href="http://sonreal.bandcamp.com/album/the-lightyear-mixtape" title="The Lightyear Mixtape from SonReal, Vancouver-based hip-hop artist">SonReal</a>.</p>
 
 	 	<h2 style="clear:left;padding-top:1em">Block list</h2>
 
 		<div>
-			<div class="ui360"><a href="http://www.freshly-ground.com/data/audio/binaural/Mak.mp3">Angry cow sound?</a></div>
-		 	<div class="ui360"><a href="../../demo/_mp3/1hz-10khz-sweep.mp3">1-10 Khz Sweep (Warning: <span style="color:#ff3333">LOUD</span>)</a></div>
+	     	<div class="ui360 ui360-vis"><a href="http://freshly-ground.com/data/audio/mpc/20090207%20-%20Loverman.mp3">20090207 - Loverman</a></div>
+		 	<div class="ui360 ui360-vis"><a href="http://freshly-ground.com/data/audio/sm2/dialup.mp3">56K Modem dial-up sound (Warning: <span style="color:#ff3333">LOUD</span>)</a></div>
+		 	<div class="ui360 ui360-vis"><a href="../../demo/_mp3/1hz-10khz-sweep.mp3">1-10 Khz Sweep (Warning: <span style="color:#ff3333">LOUD</span>)</a></div>
+			<div class="ui360 ui360-vis"><a href="../../demo/_mp3/sine,%20square,%20sawtooth,%20rando.mp3">Sine, Square, Sawtooth, Wave (Warning: <span style="color:#ff3333">LOUD</span>)</a></div>
 		</div>
-		
 
-		<div style="clear:left"></div>
+		<p class="note medium-note" style="clear:left">56K Modem sound (Creative Commons license) via <a href="http://www.freesound.org/samplesViewSingle.php?id=16475">dialup.mp3</a>, from freesound.org user <a href="http://www.freesound.org/usersViewSingle.php?id=54447">Jlew</a>.</p>
+
 		
 		<h2 style="clear:left;padding-top:1em">Variant: Annotations/meta-data</h2>
 
@@ -264,7 +284,7 @@ pre.block {
 
 		  <li>
 
-		   <div class="ui360">
+		   <div class="ui360 ui360-vis">
 		    <a href="http://freshly-ground.com/data/audio/binaural/A%20Virtual%20Haircut%20in%20San%20Francisco%20%283%20Scenes%29.mp3">A Virtual Haircut (3 scenes)</a>
 		    <div class="metadata">
 		     <div class="duration">4:43</div> <!-- total track time (for positioning while loading, until determined -->
@@ -280,7 +300,7 @@ pre.block {
 
 		  <li>
 
-		   <div class="ui360">
+		   <div class="ui360 ui360-vis">
 		    <a href="http://freshly-ground.com/data/audio/binaural/Rubber%20Chicken%20Launch%20%28office%29.mp3">Rubber Chicken Launch (Office)</a>
 
 			   <div class="metadata">
@@ -304,9 +324,6 @@ pre.block {
 		  </li>
 
 		 </ul>
-
-	</div>
-
 
 	<div style="clear:both"></div>
 	

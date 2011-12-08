@@ -1,21 +1,22 @@
-/*
-
-  SoundManager 2 Demo: Play MP3 links "in-place"
-  ----------------------------------------------
-
-  http://schillmania.com/projects/soundmanager2/
-
-  A simple demo making MP3s playable "inline"
-  and easily styled/customizable via CSS.
-
-  Requires SoundManager 2 Javascript API.
-
-*/
+/**
+ *
+ * SoundManager 2 Demo: Play MP3 links "in-place"
+ * ----------------------------------------------
+ *
+ * http://schillmania.com/projects/soundmanager2/
+ *
+ * A simple demo making MP3s playable "inline"
+ * and easily styled/customizable via CSS.
+ *
+ * Requires SoundManager 2 Javascript API.
+ *
+ */
 
 function InlinePlayer() {
   var self = this;
   var pl = this;
   var sm = soundManager; // soundManager instance
+  var isIE = (navigator.userAgent.match(/msie/i));
   this.playableClass = 'inline-playable'; // CSS class for forcing a link to be playable (eg. doesn't have .MP3 in it)
   this.excludeClass = 'inline-exclude'; // CSS class for ignoring MP3 links
   this.links = [];
@@ -24,11 +25,10 @@ function InlinePlayer() {
   this.indexByURL = [];
   this.lastSound = null;
   this.soundCount = 0;
-  var isIE = (navigator.userAgent.match(/msie/i));
 
   this.config = {
     playNext: false, // stop after one sound, or play through list until end
-	autoPlay: false  // start playing the first sound right away
+    autoPlay: false  // start playing the first sound right away
   }
 
   this.css = {
@@ -39,13 +39,17 @@ function InlinePlayer() {
     sPaused: 'sm2_paused'
   }
 
-  this.addEventHandler = function(o,evtName,evtHandler) {
-    typeof(attachEvent)=='undefined'?o.addEventListener(evtName,evtHandler,false):o.attachEvent('on'+evtName,evtHandler);
-  }
+  this.addEventHandler = (typeof window.addEventListener !== 'undefined' ? function(o, evtName, evtHandler) {
+    return o.addEventListener(evtName,evtHandler,false);
+  } : function(o, evtName, evtHandler) {
+    o.attachEvent('on'+evtName,evtHandler);
+  });
 
-  this.removeEventHandler = function(o,evtName,evtHandler) {
-    typeof(attachEvent)=='undefined'?o.removeEventListener(evtName,evtHandler,false):o.detachEvent('on'+evtName,evtHandler);
-  }
+  this.removeEventHandler = (typeof window.removeEventListener !== 'undefined' ? function(o, evtName, evtHandler) {
+    return o.removeEventListener(evtName,evtHandler,false);
+  } : function(o, evtName, evtHandler) {
+    return o.detachEvent('on'+evtName,evtHandler);
+  });
 
   this.classContains = function(o,cStr) {
 	return (typeof(o.className)!='undefined'?o.className.match(new RegExp('(\\s|^)'+cStr+'(\\s|$)')):false);
@@ -135,8 +139,8 @@ function InlinePlayer() {
   this.handleClick = function(e) {
     // a sound link was clicked
     if (typeof e.button != 'undefined' && e.button>1) {
-	  // ignore right-click
-	  return true;
+      // ignore right-click
+      return true;
     }
     var o = self.getTheDamnLink(e);
     if (o.nodeName.toLowerCase() != 'a') {
@@ -144,10 +148,9 @@ function InlinePlayer() {
       if (!o) return true;
     }
     var sURL = o.getAttribute('href');
-    if (!o.href || (!o.href.match(/\.mp3(\\?.*)$/i) && !self.classContains(o,self.playableClass)) || self.classContains(o,self.excludeClass)) {
+    if (!o.href || (!sm.canPlayLink(o) && !self.classContains(o,self.playableClass)) || self.classContains(o,self.excludeClass)) {
       return true; // pass-thru for non-MP3/non-links
     }
-    sm._writeDebug('handleClick()');
     var soundURL = (o.href);
     var thisSound = self.getSoundByURL(soundURL);
     if (thisSound) {
@@ -157,11 +160,17 @@ function InlinePlayer() {
         thisSound.togglePause();
       } else {
         // different sound
-        thisSound.togglePause(); // start playing current
         sm._writeDebug('sound different than last sound: '+self.lastSound.sID);
-        if (self.lastSound) self.stopSound(self.lastSound);
+        if (self.lastSound) {
+          self.stopSound(self.lastSound);
+        }
+        thisSound.togglePause(); // start playing current
       }
     } else {
+      // stop last sound
+      if (self.lastSound) {
+        self.stopSound(self.lastSound);
+      }
       // create sound
       thisSound = sm.createSound({
        id:'inlineMP3Sound'+(self.soundCount++),
@@ -179,9 +188,7 @@ function InlinePlayer() {
       };
       self.soundsByURL[soundURL] = thisSound;
       self.sounds.push(thisSound);
-      if (self.lastSound) self.stopSound(self.lastSound);
       thisSound.play();
-      // stop last sound
     }
 
     self.lastSound = thisSound; // reference for next call
@@ -205,7 +212,7 @@ function InlinePlayer() {
     // grab all links, look for .mp3
     var foundItems = 0;
     for (var i=0, j=oLinks.length; i<j; i++) {
-      if ((oLinks[i].href.match(/\.mp3/i) || self.classContains(oLinks[i],self.playableClass)) && !self.classContains(oLinks[i],self.excludeClass)) {
+      if ((sm.canPlayLink(oLinks[i]) || self.classContains(oLinks[i],self.playableClass)) && !self.classContains(oLinks[i],self.excludeClass)) {
         self.addClass(oLinks[i],self.css.sDefault); // add default CSS decoration
         self.links[foundItems] = (oLinks[i]);
         self.indexByURL[oLinks[i].href] = foundItems; // hack for indexing
@@ -214,9 +221,9 @@ function InlinePlayer() {
     }
     if (foundItems>0) {
       self.addEventHandler(document,'click',self.handleClick);
-	  if (self.config.autoPlay) {
-	    self.handleClick({target:self.links[0],preventDefault:function(){}});
-	  }
+      if (self.config.autoPlay) {
+        self.handleClick({target:self.links[0],preventDefault:function(){}});
+      }
     }
     sm._writeDebug('inlinePlayer.init(): Found '+foundItems+' relevant items.');
   }
@@ -228,13 +235,19 @@ function InlinePlayer() {
 var inlinePlayer = null;
 
 soundManager.debugMode = true; // disable or enable debug output
+
+soundManager.preferFlash = false; // use HTML5 audio for MP3/MP4, if available
 soundManager.useFlashBlock = true;
 soundManager.url = '../../swf/'; // path to directory containing SM2 SWF
 
+// optional: enable MPEG-4/AAC support (requires flash 9)
+soundManager.flashVersion = 9;
+soundManager.useMovieStar = true;
+
+// ----
+
 soundManager.onready(function() {
-  if (soundManager.supported()) {
-    // soundManager.createSound() etc. may now be called
-    inlinePlayer = new InlinePlayer();
-  }
+  // soundManager.createSound() etc. may now be called
+  inlinePlayer = new InlinePlayer();
 });
 
