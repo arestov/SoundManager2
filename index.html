@@ -1,7 +1,30 @@
 <html>
 <head>
 	<title>Remote Soundmanager2</title>
+	<script type="text/javascript" src="js/soundmanager2.js"></script>
+	<script type="text/javascript">
+		(function(){
+			soundManager = new SoundManager('swf', false, {
+				flashVersion : 9,
+				useFlashBlock : true,
+				debugMode : false,
+				wmode : 'opaque',
+				useHighPerformance : true
+			});
+			soundManager.onready(function() {
+				if (soundManager.supported()) {
+					console.log('sm2 ok')
+
+				} else {
+					console.log('sm2 notok')
+			
+				}
+			});
+		})();
+
+	</script>
 </head>
+<!-- 16:16 -->
 <body>
 
 </body>
