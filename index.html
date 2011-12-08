@@ -1,21 +1,78 @@
 <html>
 <head>
 	<title>Remote Soundmanager2</title>
+	<script type="text/javascript" src="js/json2.min.js"></script>
 	<script type="text/javascript" src="js/soundmanager2.js"></script>
 	<script type="text/javascript">
+		var cloneObj= function(acceptor, donor, black_list, white_list){
+		  //not deep! 
+		  var _no = acceptor || {};
+		  for (var a in donor){
+		    if (!white_list || white_list.indexOf(a) > -1){
+		      if (!black_list || black_list.indexOf(a) == -1){
+		        _no[a] = donor[a];
+		      }
+		    }
+		    
+		  }
+		  return _no;
+		};
+		var getUrlParameters= function(str){
+			var url_vars = str.replace(/^\?/,'').split('&');
+			var full_url = {};
+			for (var i=0; i < url_vars.length; i++) {
+				var _h = url_vars[i].split('=');
+				full_url[_h[0]] = _h[1];
+			};
+			return full_url;
+		};
+
+
+		var sm2,
+			iframed = window.parent != window;
+
+		var sendMsg = function(name, param){
+			param = (param === Object(param) ? JSON.stringify(param) : !!param);
+
+			if (iframed){
+				window.parent.postMessage("" + name + ": " + param, "*");
+			}
+		};
+
+		var sm2Ready = function(soundManager){
+			if (soundManager){
+				sm2 = soundManager;
+			} 
+			sendMsg('sm2loaded', !!soundManager);
+
+		};
+
+
+		
+		
+
 		(function(){
-			soundManager = new SoundManager('swf', false, {
+			if (location.hash && location.hash.length > 4){
+				var opts_from_loc = getUrlParameters(  location.hash.replace('#', '')  );
+			}
+			var sm2opts = {
 				flashVersion : 9,
 				useFlashBlock : true,
 				debugMode : false,
 				wmode : 'opaque',
 				useHighPerformance : true
-			});
+			};
+			if (opts_from_loc){
+				cloneObj(  sm2opts, opts_from_loc  );
+				
+			}
+			var soundManager = new SoundManager('swf', false, sm2opts);
 			soundManager.onready(function() {
 				if (soundManager.supported()) {
 					console.log('sm2 ok')
-
+					sm2Loaded(soundManager);
 				} else {
+					sm2Loaded();
 					console.log('sm2 notok')
 			
 				}
