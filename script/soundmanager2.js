@@ -34,8 +34,8 @@ var cloneObj= function(acceptor, donor, black_list, white_list){
   //not deep! 
   var _no = acceptor || {};
   for(var a in donor){
-    if (!white_list || !!~white_list.indexOf(a)){
-      if (!black_list || !~black_list.indexOf(a)){
+    if (!white_list || white_list.indexOf(a) > -1){
+      if (!black_list || black_list.indexOf(a) == -1){
         _no[a] = donor[a];
       }
     }
