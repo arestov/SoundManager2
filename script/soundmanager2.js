@@ -30,6 +30,20 @@
 
 (function(window) {
 
+var cloneObj= function(acceptor, donor, black_list, white_list){
+  //not deep! 
+  var _no = acceptor || {};
+  for(var a in donor){
+    if (!white_list || !!~white_list.indexOf(a)){
+      if (!black_list || !~black_list.indexOf(a)){
+        _no[a] = donor[a];
+      }
+    }
+    
+  }
+  return _no;
+};
+
 var soundManager = null;
 
 /**
@@ -42,7 +56,10 @@ var soundManager = null;
  * @return {SoundManager} The new SoundManager instance
  */
 
-function SoundManager(smURL, smID) {
+function SoundManager(smURL, smID, opts) {
+
+
+  
 
   // Top-level configuration options
 
@@ -63,6 +80,32 @@ function SoundManager(smURL, smID) {
   this.html5Test = /^(probably|maybe)$/i; // HTML5 Audio() format support test. Use /^probably$/i; if you want to be more conservative.
   this.preferFlash = true;           // overrides useHTML5audio. if true and flash support present, will try to use flash for MP3/MP4 as needed since HTML5 audio support is still quirky in browsers.
   this.noSWFCache = false;           // if true, appends ?ts={date} to break aggressive SWF caching.
+
+  if (opts && opts === Object(opts)){
+    cloneObj(this, opts, false, 
+      [
+        "allowScriptAccess",
+        "altURL",
+        "consoleOnly",
+        "debugFlash",
+        "debugMode",
+        "defaultOptions",
+        "flash9Options",
+        "features",
+        "flashLoadTimeout",
+        "flashVersion",
+        "movieStarOptions",
+        "url",
+        "useConsole",
+        "useFastPolling",
+        "flashPollingInterval",
+        "useFlashBlock",
+        "useHighPerformance",
+        "useHTML5Audio",
+        "useMovieStar",
+        "wmode",
+        "waitForWindowLoad"]);
+  }
 
   this.audioFormats = {
 
@@ -4505,8 +4548,8 @@ function SoundManager(smURL, smID) {
 
 // SM2_DEFER details: http://www.schillmania.com/projects/soundmanager2/doc/getstarted/#lazy-loading
 
-if (typeof SM2_DEFER === 'undefined' || !SM2_DEFER) {
-  soundManager = new SoundManager();
+if (typeof SM2_DEFER == 'undefined' || !SM2_DEFER) {
+  //soundManager = new SoundManager();
 }
 
 /**
