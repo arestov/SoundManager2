@@ -59,7 +59,7 @@
 			var args = Array.prototype.slice.call(arguments);
 			if (args.length){
 				if (iframed){
-					window.parent.postMessage(JSON.stringify(args), "*");
+					window.parent.postMessage(args, "*");
 				}
 			}		
 		};
