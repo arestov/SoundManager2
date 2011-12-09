@@ -1,9 +1,25 @@
 <html>
 <head>
 	<title>Remote Soundmanager2</title>
-	<script type="text/javascript" src="js/json2.min.js"></script>
-	<script type="text/javascript" src="js/soundmanager2.js"></script>
 	<script type="text/javascript">
+		var addEvent = window.addEventListener ? 
+			function(elem, evType, fn){
+				elem.addEventListener(evType, fn, false);
+				return fn;
+			}:
+			function(elem, evType, fn){
+				elem.attachEvent('on' + evType, fn);
+				return fn;
+			};
+		var removeEvent = window.addEventListener ?
+			function(elem, evType, fn){
+				elem.removeEventListener(evType, fn, false);
+			}:
+			function(elem, evType, fn){
+				elem.detachEvent('on' + evType, fn)
+			};
+
+
 		var cloneObj= function(acceptor, donor, black_list, white_list){
 		  //not deep! 
 		  var _no = acceptor || {};
@@ -32,6 +48,11 @@
 			};
 			return full_url;
 		};
+	</script>
+	<script type="text/javascript" src="js/json2.min.js"></script>
+	<script type="text/javascript" src="js/soundmanager2.js"></script>
+	<script type="text/javascript">
+		
 
 
 		var sm2,
@@ -141,7 +162,12 @@
 			}
 		};
 		
-		
+		addEvent(window, "message", function(e){
+
+			var data = e.data;
+			console.log(data)
+			//e.data
+		});
 
 		(function(){
 			if (location.hash && location.hash.length > 4){
