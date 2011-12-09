@@ -74,34 +74,34 @@
 
 		var soundSample = {
 			onplay: function(){
-				sendMsg('play', this.id)
+				sendMsg('play', this.sID)
 			},
 			onresume: function(){
-				sendMsg('play', this.id)
+				sendMsg('play', this.sID)
 			},
 			onpause: function(){
-				sendMsg('pause', this.id)
+				sendMsg('pause', this.sID)
 			},
 			onstop: function(){
-				sendMsg('stop', this.id)
+				sendMsg('stop', this.sID)
 			},
 			onfinish: function(){
-				sendMsg('finish', this.id)
+				sendMsg('finish', this.sID)
 			},
 			whileplaying: function(){
-				sendMsg('playing', this.id, {
+				sendMsg('playing', this.sID, {
 					duration:  (this.bytesTotal * this.duration)/this.bytesLoaded,
 					position: this.position
 				});
 			},
 			whileloading: function(){
-				sendMsg('loading', this.id, {
+				sendMsg('loading', this.sID, {
 					total: this.bytesTotal,
 					loaded: this.bytesLoaded
 				});
 			},
 			ondataerror: function(){
-				sendMsg('error', this.id);
+				sendMsg('error', this.sID);
 			}
 		};
 		
