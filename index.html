@@ -90,7 +90,7 @@
 				});
 			}
 		};
-
+		
 		var plc = {
 			create: function(s, opts){
 				if (!s || s.url != opts.url){
@@ -98,7 +98,9 @@
 						s.destroySound()
 					}
 					var sound_options = cloneObj({}, soundSample);
+					sound_options.id = opts.id;
 					sound_options.url = opts.url;
+
 					if (opts.volume){
 						sound_options.volume = parseFloat(opts.volume);
 					}
