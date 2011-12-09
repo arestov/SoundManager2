@@ -66,7 +66,7 @@
 				cloneObj(  sm2opts, opts_from_loc  );
 				
 			}
-			var soundManager = new SoundManager('swf', false, sm2opts);
+			soundManager = new SoundManager('swf', false, sm2opts);
 			soundManager.onready(function() {
 				if (soundManager.supported()) {
 					console.log('sm2 ok')
