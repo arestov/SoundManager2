@@ -23,6 +23,12 @@
 			for (var i=0; i < url_vars.length; i++) {
 				var _h = url_vars[i].split('=');
 				full_url[_h[0]] = _h[1];
+				if (_h[1]){
+					try {
+						full_url[_h[0]] = JSON.parse(_h[1]);
+					} catch (e){}
+				}
+				
 			};
 			return full_url;
 		};
@@ -32,22 +38,106 @@
 			iframed = window.parent != window;
 
 		var sendMsg = function(name, param){
-			param = (param === Object(param) ? JSON.stringify(param) : !!param);
+			if (typeof param == 'undefined'){
+				param = ''
+			} else{
+				param =  ": " + (param === Object(param) ? JSON.stringify(param) : !!param);
+			}
+			
 
 			if (iframed){
-				window.parent.postMessage("" + name + ": " + param, "*");
+				window.parent.postMessage("" + name + param, "*");
 			}
 		};
 
 		var sm2Loaded = function(soundManager){
 			if (soundManager){
 				sm2 = soundManager;
-			} 
+			}
 			sendMsg('sm2loaded', !!soundManager);
 
 		};
 
+		var soundSample = {
+			onplay: function(){
+				sendMsg('play', {id: this.id})
+			},
+			onresume: function(){
+				sendMsg('play', {id: this.id})
+			},
+			onpause: function(){
+				sendMsg('pause', {id: this.id})
+			},
+			onstop: function(){
+				sendMsg('stop', {id: this.id})
+			},
+			onfinish: function(){
+				sendMsg('finish', {id: this.id})
+			},
+			whileplaying: function(){
+				sendMsg('playing', {
+					id: this.id
+				});
+			},
+			whileloading: function(){
+				sendMsg('loading', {
+					id: this.id
+				});
+			},
+			ondataerror: function(){
+				sendMsg('error', {
+					id: this.id
+				});
+			}
+		};
 
+		var plc = {
+			create: function(s, opts){
+				if (!s || s.url != opts.url){
+					if (s){
+						s.destroySound()
+					}
+					var sound_options = cloneObj({}, soundSample);
+					sound_options.url = opts.url;
+					if (opts.volume){
+						sound_options.volume = parseFloat(opts.volume);
+					}
+					sm.createSound(sound_options);
+				}
+			},
+			play: function(s){
+				s.play();
+			},
+			stop: function(s){
+				if (s){
+					s.stop();
+				}
+			},
+			pause: function(s){
+				if (s){
+					s.pause();
+				}
+			},
+			setVolume: function(s, vol){
+				
+			},
+			setPosition: function(s, pos){
+				
+			},
+			remove: function(s){
+				if (s){
+					s.destroySound();
+				}
+			},
+			load: function(s){
+				if (s){
+					s.load();
+				}
+			},
+			unload: function(id){
+				
+			}
+		};
 		
 		
 
