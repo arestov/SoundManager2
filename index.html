@@ -52,23 +52,16 @@
 	<script type="text/javascript" src="js/json2.min.js"></script>
 	<script type="text/javascript" src="js/soundmanager2.js"></script>
 	<script type="text/javascript">
-		
-
-
 		var sm2,
 			iframed = window.parent != window;
 
-		var sendMsg = function(name, param){
-			if (typeof param == 'undefined'){
-				param = ''
-			} else{
-				param =  ": " + (param === Object(param) ? JSON.stringify(param) : !!param);
-			}
-			
-
-			if (iframed){
-				window.parent.postMessage("" + name + param, "*");
-			}
+		var sendMsg = function(name, p1, p2){
+			var args = Array.prototype.slice.call(arguments);
+			if (args.length){
+				if (iframed){
+					window.parent.postMessage(JSON.stringify(args), "*");
+				}
+			}		
 		};
 
 		var sm2Loaded = function(soundManager){
@@ -81,34 +74,34 @@
 
 		var soundSample = {
 			onplay: function(){
-				sendMsg('play', {id: this.id})
+				sendMsg('play', this.id)
 			},
 			onresume: function(){
-				sendMsg('play', {id: this.id})
+				sendMsg('play', this.id)
 			},
 			onpause: function(){
-				sendMsg('pause', {id: this.id})
+				sendMsg('pause', this.id)
 			},
 			onstop: function(){
-				sendMsg('stop', {id: this.id})
+				sendMsg('stop', this.id)
 			},
 			onfinish: function(){
-				sendMsg('finish', {id: this.id})
+				sendMsg('finish', this.id)
 			},
 			whileplaying: function(){
-				sendMsg('playing', {
-					id: this.id
+				sendMsg('playing', this.id, {
+					duration:  (this.bytesTotal * this.duration)/this.bytesLoaded,
+					position: this.position
 				});
 			},
 			whileloading: function(){
-				sendMsg('loading', {
-					id: this.id
+				sendMsg('loading', this.id, {
+					total: this.bytesTotal,
+					loaded: this.bytesLoaded
 				});
 			},
 			ondataerror: function(){
-				sendMsg('error', {
-					id: this.id
-				});
+				sendMsg('error', this.id);
 			}
 		};
 		
@@ -142,10 +135,14 @@
 				}
 			},
 			setVolume: function(s, vol){
-				
+				if (s){
+					s.setVolume(parseFloat(pos));
+				}
 			},
 			setPosition: function(s, pos){
-				
+				if (s){
+					s.setPosition(parseFloat(pos));
+				}
 			},
 			remove: function(s){
 				if (s){
@@ -157,13 +154,28 @@
 					s.load();
 				}
 			},
-			unload: function(id){
-				
+			unload: function(s){
+				if (s){
+					s.unload();
+				}
 			}
 		};
-		
+		var receiveMsg = function(method, id, opts){
+			if (sm2 && method && plc[method]){
+				plc[method](sm2.getSoundById(id), opts);
+			}
+		};
 		addEvent(window, "message", function(e){
+			if (e.origin.indexOf('http') != 0){
+				var data;
+				try {
+					data = JSON.parse(e.data);
+				} catch (e){};
 
+				if (data && data instanceof Array){
+					receiveMsg.apply(null, data);
+				}
+			}
 			var data = e.data;
 			console.log(data)
 			//e.data
