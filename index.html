@@ -161,7 +161,10 @@
 			}
 		};
 		var receiveMsg = function(method, id, opts){
-			if (sm2 && method && plc[method]){
+			if (sm2 && method && plc[method] && id){
+				if (opts && opts === Object(opts)){
+					cloneObj(opts, {id: id});
+				}
 				plc[method](sm2.getSoundById(id), opts);
 			}
 		};
