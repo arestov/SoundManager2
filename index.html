@@ -50,6 +50,7 @@
 		};
 	</script>
 	<script type="text/javascript" src="js/json2.min.js"></script>
+	<script type="text/javascript" src="js/c_quene.js"></script>
 	<script type="text/javascript" src="js/soundmanager2.js"></script>
 	<script type="text/javascript">
 		var sm2,
@@ -71,6 +72,8 @@
 			sendMsg('sm2loaded', !!soundManager);
 
 		};
+
+		var f_stack = new funcs_queue();
 
 		var soundSample = {
 			onplay: function(){
@@ -165,7 +168,9 @@
 				if (opts && opts === Object(opts)){
 					cloneObj(opts, {id: id});
 				}
-				plc[method](sm2.getSoundById(id), opts);
+				f_stack.add(function(){
+					plc[method](sm2.getSoundById(id), opts);
+				});
 			}
 		};
 		addEvent(window, "message", function(e){
