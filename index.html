@@ -164,14 +164,15 @@
 			}
 		};
 		var receiveMsg = function(method, id, opts){
-			if (sm2 && method && plc[method] && id){
-				if (opts && opts === Object(opts)){
-					cloneObj(opts, {id: id});
-				}
-				f_stack.add(function(){
+			f_stack.add(function(){
+				if (sm2 && method && plc[method] && id){
+					if (opts && opts === Object(opts)){
+						cloneObj(opts, {id: id});
+					}
 					plc[method](sm2.getSoundById(id), opts);
-				});
-			}
+				}
+			});
+			
 		};
 		addEvent(window, "message", function(e){
 			if (e.origin.indexOf('http') != 0){
