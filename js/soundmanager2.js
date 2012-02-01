@@ -102,7 +102,7 @@ function SoundManager(smURL, smID, opts) {
 
   var _this = this;
   this.getC = function() {
-    return _this.
+    return _this.domContainer;
   };
 
   if (opts && opts === Object(opts)){
