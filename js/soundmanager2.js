@@ -3845,7 +3845,7 @@ function SoundManager(smURL, smID, opts) {
 
       if (_s.debugMode && !_id(oD.id)) {
         try {
-          oTarget = this.domContainer;
+          oTarget = _s.domContainer;
           oTarget.appendChild(oD);
         } catch(e2) {
           throw new Error(_str('domError')+' \n'+e2.toString());
@@ -4554,7 +4554,7 @@ function SoundManager(smURL, smID, opts) {
 
     _initDebug();
     extraClass = _getSWFCSS();
-    oTarget = this.domContainer;
+    oTarget = _s.domContainer;
 
     if (oTarget) {
 
