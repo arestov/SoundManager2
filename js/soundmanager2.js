@@ -32,6 +32,9 @@
 
 
 var indexOf = function(arr, obj, start) {
+  if (arr.indexOf){
+    return arr.indexOf.call(arr, obj, start);
+  }
   for (var i = (start || 0); i < arr.length; i++) {
       if (arr[i] == obj) {
         return i;
