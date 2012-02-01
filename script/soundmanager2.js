@@ -102,9 +102,8 @@ function SoundManager(smURL, smID, opts) {
 
   var _this = this;
   this.getC = function() {
-    return _this.
+    return _this.domContainer;
   };
-
   if (opts && opts === Object(opts)){
     cloneObj(this, opts, false, 
       [
@@ -2958,7 +2957,7 @@ function SoundManager(smURL, smID, opts) {
         _t._iO.onmetadata.apply(_t);
       }
 
-	};
+  };
 
     this._onid3 = function(oID3Props, oID3Data) {
 
@@ -3846,7 +3845,7 @@ function SoundManager(smURL, smID, opts) {
 
       if (_s.debugMode && !_id(oD.id)) {
         try {
-          oTarget = this.domContainer;
+          oTarget = _s.domContainer;
           oTarget.appendChild(oD);
         } catch(e2) {
           throw new Error(_str('domError')+' \n'+e2.toString());
@@ -4555,7 +4554,7 @@ function SoundManager(smURL, smID, opts) {
 
     _initDebug();
     extraClass = _getSWFCSS();
-    oTarget = this.domContainer;
+    oTarget = _s.domContainer;
 
     if (oTarget) {
 
@@ -4946,7 +4945,7 @@ function SoundManager(smURL, smID, opts) {
   };
 
   _domContentLoaded = function() {
-
+    _delayWaitForEI();
     if (_didDCLoaded) {
       return false;
     }
@@ -5012,16 +5011,6 @@ function SoundManager(smURL, smID, opts) {
 
   };
 
-  _domContentLoadedIE = function() {
-
-    if (_doc.readyState === 'complete') {
-      _domContentLoaded();
-      _doc.detachEvent('onreadystatechange', _domContentLoadedIE);
-    }
-
-    return true;
-
-  };
 
   _winOnLoad = function() {
     // catch edge case of _initComplete() firing after window.load()
@@ -5035,7 +5024,6 @@ function SoundManager(smURL, smID, opts) {
   // focus and window load, init (primarily flash-driven)
   _event.add(_win, 'focus', _handleFocus);
   _event.add(_win, 'load', _handleFocus);
-  _event.add(_win, 'load', _delayWaitForEI);
   _event.add(_win, 'load', _winOnLoad);
 
 
@@ -5043,28 +5031,10 @@ function SoundManager(smURL, smID, opts) {
     // massive Safari 3.1 focus detection hack
     _event.add(_win, 'mousemove', _handleFocus);
   }
-
-  if (_doc.addEventListener) {
-
-    _doc.addEventListener('DOMContentLoaded', _domContentLoaded, false);
-
-  } else if (_doc.attachEvent) {
-
-    _doc.attachEvent('onreadystatechange', _domContentLoadedIE);
-
-  } else {
-
-    // no add/attachevent support - safe to assume no JS -> Flash either
-    _debugTS('onload', false);
-    _catchError({type:'NO_DOM2_EVENTS', fatal:true});
-
-  }
-
-  if (_doc.readyState === 'complete') {
-    // DOMReady has already happened.
-    setTimeout(_domContentLoaded,100);
-  }
-
+  this.appended = function() {
+    _domContentLoaded();
+    return this;
+  };
 } // SoundManager()
 
 // SM2_DEFER details: http://www.schillmania.com/projects/soundmanager2/doc/getstarted/#lazy-loading
