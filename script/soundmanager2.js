@@ -30,12 +30,26 @@
 
 (function(window) {
 
+
+var indexOf = function(arr, obj, start) {
+  if (arr.indexOf){
+    return arr.indexOf.call(arr, obj, start);
+  }
+  for (var i = (start || 0); i < arr.length; i++) {
+      if (arr[i] == obj) {
+        return i;
+      }
+    }
+  return -1;
+};
+
+
 var cloneObj= function(acceptor, donor, black_list, white_list){
   //not deep! 
   var _no = acceptor || {};
   for(var a in donor){
-    if (!white_list || white_list.indexOf(a) > -1){
-      if (!black_list || black_list.indexOf(a) == -1){
+    if (!white_list || indexOf(white_list, a) > -1){
+      if (!black_list || indexOf(black_list, a) == -1){
         _no[a] = donor[a];
       }
     }
@@ -80,6 +94,13 @@ function SoundManager(smURL, smID, opts) {
   this.html5Test = /^(probably|maybe)$/i; // HTML5 Audio() format support test. Use /^probably$/i; if you want to be more conservative.
   this.preferFlash = true;           // overrides useHTML5audio. if true and flash support present, will try to use flash for MP3/MP4 as needed since HTML5 audio support is still quirky in browsers.
   this.noSWFCache = false;           // if true, appends ?ts={date} to break aggressive SWF caching.
+  
+  this.domContainer = document.createElement('div');
+
+  var _this = this;
+  this.getC = function() {
+    return _this.
+  };
 
   if (opts && opts === Object(opts)){
     cloneObj(this, opts, false, 
@@ -3464,7 +3485,7 @@ function SoundManager(smURL, smID, opts) {
 
       if (_s.debugMode && !_id(oD.id)) {
         try {
-          oTarget = _getDocument();
+          oTarget = this.domContainer;
           oTarget.appendChild(oD);
         } catch(e2) {
           throw new Error(_str('domError')+' \n'+e2.toString());
@@ -4042,7 +4063,7 @@ function SoundManager(smURL, smID, opts) {
 
     _initDebug();
     extraClass = _getSWFCSS();
-    oTarget = _getDocument();
+    oTarget = this.domContainer;
 
     if (oTarget) {
 
