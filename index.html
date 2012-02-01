@@ -18,7 +18,22 @@
 			function(elem, evType, fn){
 				elem.detachEvent('on' + evType, fn)
 			};
-
+		var domReady = function(d, callback){
+			if (d.readyState == 'complete' || d.readyState == 'loaded'){
+				setTimeout(callback, 30);
+			} else{
+				var done;
+				var f = function(){
+					if (!done){
+						done = true;
+						callback();
+						
+					}
+				};
+				addEvent(d.defaultView, 'load', f);
+				addEvent(d, 'DOMContentLoaded', f);
+			}
+		};
 
 		var cloneObj= function(acceptor, donor, black_list, white_list){
 		  //not deep! 
@@ -222,6 +237,11 @@
 			
 				}
 			});
+			var doc = window.document;
+			domReady(doc, function() {
+				doc.body.appendChild(soundManager.getC());
+			});
+			
 		})();
 
 	</script>
