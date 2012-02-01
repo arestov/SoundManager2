@@ -40,7 +40,7 @@ package {
 
   public class SoundManager2_AS3 extends Sprite {
 
-    public var version:String = "V2.97a.20111030";
+    public var version:String = "V2.97a.20111220";
     public var version_as:String = "(AS3/Flash 9)";
 
     /**
@@ -206,7 +206,7 @@ package {
         if (isFirstCall == true) {
           flashDebug('Testing Flash -&gt; JS...');
           var d: Date = new Date();
-          ExternalInterface.call(baseJSController + "._externalInterfaceOK", d.getTime());
+          ExternalInterface.call(baseJSController + "._externalInterfaceOK", d.getTime(), version);
           flashDebug('Flash -&gt; JS OK');
         } else {
           writeDebug('SM2 SWF ' + version + ' ' + version_as);
@@ -824,7 +824,7 @@ package {
     public function _start(sID:String, nLoops: int, nMsecOffset: int) : void {
       var s: SoundManager2_SMSound_AS3 = soundObjects[sID];
       if (!s) return void;
-      writeDebug('start: ' + nMsecOffset+(nLoops?', loops: '+nLoops:''));
+      writeDebug('start: ' + nMsecOffset + (nLoops > 1 ? ', loops: ' + nLoops : ''));
       s.lastValues.paused = false; // reset pause if applicable
       s.lastValues.loops = (nLoops || 1);
       if (!s.useNetstream) {

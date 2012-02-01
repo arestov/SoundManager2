@@ -150,7 +150,6 @@ package {
       switch (event.info.code) {
 
         case "NetConnection.Connect.Success":
-          writeDebug('NetConnection: connected');
           try {
             this.ns = new NetStream(this.nc);
             this.ns.checkPolicyFile = this.checkPolicyFile;
@@ -162,7 +161,9 @@ package {
             this.ns.receiveAudio(true);
             this.addNetstreamEvents();
             this.connected = true;
-            if (this.useEvents) {
+            // RTMP-only
+            if (this.serverUrl && this.useEvents) {
+              writeDebug('NetConnection: connected');
               writeDebug('firing _onconnect for '+this.sID);
               ExternalInterface.call(this.sm.baseJSObject + "['" + this.sID + "']._onconnect", 1);
             }
@@ -229,9 +230,10 @@ package {
     }
 
     public function metaDataHandler(infoObject: Object) : void {
+      var prop:String;
       if (sm.debugEnabled) {
         var data:String = new String();
-        for (var prop:* in infoObject) {
+        for (prop in infoObject) {
           data += prop+': '+infoObject[prop]+' \n';
         }
         writeDebug('Metadata: '+data);
@@ -243,10 +245,19 @@ package {
         // ExternalInterface.call(baseJSObject + "['" + this.sID + "']._whileloading", this.ns.bytesLoaded, this.ns.bytesTotal, infoObject.duration*1000);
         ExternalInterface.call(baseJSObject + "['" + this.sID + "']._whileloading", this.bytesLoaded, this.bytesTotal, (infoObject.duration || this.duration))
       }
-      // null this out for the duration of this object's existence.
-      // it may be called multiple times.
-      this.cc.onMetaData = function(infoObject: Object) : void {}
-
+      var metaData:Array = [];
+      var metaDataProps:Array = [];
+      for (prop in infoObject) {
+        metaData.push(prop);
+        metaDataProps.push(infoObject[prop]);
+      }
+      // pass infoObject to _onmetadata, too
+      ExternalInterface.call(baseJSObject + "['" + this.sID + "']._onmetadata", metaData, metaDataProps);
+      // this handler may fire multiple times, eg., when a song changes while playing an RTMP stream.
+      if (!this.serverUrl) {
+        // disconnect for non-RTMP cases, since multiple firings may mess up duration.
+        this.cc.onMetaData = function(infoObject: Object) : void {}
+      }
     }
 
     public function getWaveformData() : void {
@@ -273,10 +284,14 @@ package {
 
         writeDebug("SMSound::start nMsecOffset "+ nMsecOffset+ ' nLoops '+nLoops + ' current bufferTime '+this.ns.bufferTime+' current bufferLength '+this.ns.bufferLength+ ' this.lastValues.position '+this.lastValues.position);
 
+        // mark for later Netstream.Play.Stop / sound completion
+        this.finished = false;
+
         this.cc.onMetaData = this.metaDataHandler;
 
         // Don't seek if we don't have to because it destroys the buffer
         var set_position:Boolean = this.lastValues.position != null && this.lastValues.position != nMsecOffset;
+
         if (set_position) {
           // Minimize the buffer so playback starts ASAP
           this.ns.bufferTime = this.bufferTime;
@@ -434,13 +449,15 @@ package {
       // @see http://www.actionscript.org/forums/archive/index.php3/t-159194.html
       if (e.info.code == "NetStream.Play.Stop") {
 
-        if (!this.useNetstream) {
-          // finished playing
-          // this.didFinish = true; // will be reset via JS callback
+        if (!this.finished && (!this.useNetstream || !this.serverUrl)) {
+
+          // finished playing, and not RTMP
           writeDebug('calling onfinish for a sound');
           // reset the sound? Move back to position 0?
           this.sm.checkProgress();
+          this.finished = true; // will be reset via JS callback
           ExternalInterface.call(baseJSObject + "['" + this.sID + "']._onfinish");
+
         }
 
       } else if (e.info.code == "NetStream.Play.Start" || e.info.code == "NetStream.Buffer.Empty" || e.info.code == "NetStream.Buffer.Full") {
@@ -469,11 +486,11 @@ package {
         // However, if you pause and let the whole song buffer, Buffer.Flush is called followed by
         // Buffer.Empty, so handle that case too.
         //
-        // Ignore this event if we are more than 5 seconds from the end of the song.
+        // Ignore this event if we are more than 3 seconds from the end of the song.
         if (e.info.code == "NetStream.Buffer.Empty" && (this.lastNetStatus == 'NetStream.Play.Stop' || this.lastNetStatus == 'NetStream.Buffer.Flush')) {
-          if (this.duration && (this.ns.time * 1000) < (this.duration - 5000)) {
+          if (this.duration && (this.ns.time * 1000) < (this.duration - 3000)) {
             writeDebug('Ignoring Buffer.Empty because this is too early to be the end of the stream! (sID: '+this.sID+', time: '+(this.ns.time*1000)+', duration: '+this.duration+')');
-          } else {
+          } else if (!this.finished) {
             this.finished = true;
             writeDebug('calling onfinish for sound '+this.sID);
             this.sm.checkProgress();

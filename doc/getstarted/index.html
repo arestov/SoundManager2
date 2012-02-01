@@ -16,7 +16,8 @@
 <script type="text/javascript" src="../../demo/index.js"></script>
 <script type="text/javascript">
 	soundManager.useFlashBlock = true;
-        soundManager.bgColor = '#f6f6f6';
+	soundManager.consoleOnly = false;
+    soundManager.bgColor = '#f6f6f6';
 	soundManager.debugMode = true;
 	soundManager.debugFlash = true; // enable flash debug output for this page
 	soundManager.preferFlash = true;
@@ -110,6 +111,8 @@
 	
  </div>
 
+ <div id="main-wrapper">
+
  <div id="main" class="triple">
 
 		<div class="columnar">
@@ -129,8 +132,8 @@
 				 <h3>SoundManager 2 Tutorial: What, Why, How</h3>
 			
 				 <p><strong>Problem:</strong> Browsers lack good, consistent native audio support. (HTML 5's <code>Audio()</code> is the future, but is still in development.)</p>
-				 <p><strong>Solution:</strong> Javascript API using HTML5 Audio() + headless Flash via ExternalInterface, works almost everywhere. If HTML5 is supported but "non-free" MP3/MP4 formats are not, flash is used as a fallback.</p>
-				 <p>SoundManager 2 wraps and extends both the Flash and HTML Audio Sound APIs, providing a single, unified sound API to Javascript; the API is the same, whether HTML or Flash is ultimately used to play sound. (The flash portion is hidden, transparent to both developers and end users.)</p>
+				 <p><strong>Solution:</strong> Javascript API using HTML5 Audio() + headless Flash via ExternalInterface, works almost everywhere. If HTML5 is supported but "non-free" MP3/MP4 formats are not, flash can be used as a fallback.</p>
+				 <p>SoundManager 2 wraps and extends both the HTML Audio and Flash Audio APIs, providing a single, unified sound API to Javascript; the API is consistent regardless of the technology working under the hood to play sound. (The flash portion is hidden, transparent to both developers and end users.)</p>
 
 				</div>
 
@@ -157,8 +160,8 @@
 				  <pre>&lt;script src="<span>soundmanager2.js</span>"&gt;&lt;/script&gt;</pre>
 				 </td>
 				 <td>Development, testing, debugging</td>
-				 <td class="nw">117 KB</td>
-				 <td class="nw">~31 KB</td>
+				 <td class="nw">128 KB</td>
+				 <td class="nw">35 KB</td>
 			   </tr>
 
 			   <tr>
@@ -167,8 +170,8 @@
 				  <pre>&lt;script src="<span>soundmanager2-nodebug.js</span>"&gt;&lt;/script&gt;</pre>
 				 </td>
 				 <td>Production, "clean" no-debug code</td>
-				 <td class="nw">65 KB</td>
-				 <td class="nw">~15 KB</td>
+				 <td class="nw">70 KB</td>
+				 <td class="nw">16 KB</td>
 			   </tr>
 
 			   <tr>
@@ -177,8 +180,8 @@
 				  <pre>&lt;script src="<span>soundmanager2-jsmin.js</span>"&gt;&lt;/script&gt;</pre>
 				 </td>
 				 <td>Production, with debug code</td>
-				 <td class="nw">45 KB</td>
-				 <td class="nw">~15 KB</td>
+				 <td class="nw">46 KB</td>
+				 <td class="nw">16 KB</td>
 			   </tr>
 
 			   <tr>
@@ -188,7 +191,7 @@
 				 </td>
 				 <td>Production-optimized, debug code removed</td>
 				 <td class="nw">32 KB</td>
-				 <td class="nw booyaa" title="Best-case scenario for load time/performance">10 KB!</td>
+				 <td class="nw booyaa" title="Best-case scenario for load time/performance">10.9 KB!</td>
 			   </tr>
 
 			  </table>
@@ -205,7 +208,7 @@ soundManager.useFlashBlock = false; <span><span>// optionally, enable when you'r
  * iPad/iPhone and devices without flash installed will always attempt to use it.
 */</span></span>
 soundManager.onready(function() {
-  <span><span>// Ready to use; soundManager.createSound() etc. can now be called.</span></span>
+  <span><span>// Ready to use; <a href="../#soundmanager-createsound">soundManager.createSound()</a> etc. can now be called.</span></span>
 });
 &lt;/script&gt;</pre>
 
@@ -254,7 +257,7 @@ soundManager.onready(function() {
 <div class="figure">
 
  <div class="code">
-  <span>soundmanager2.js</span> <span class="mid">&lt;-flash externalinterface magic-&gt;</span> <span>soundmanager2.swf</span> <span class="mid">&lt;- HTTP -&gt;</span> <span>.mp3/.mp4</span>
+  <span>soundmanager2.js</span> <span class="mid">&lt;- Flash + ExternalInterface, and/or HTML5 Audio() -&gt;</span> <span class="mid">&lt;- HTTP -&gt;</span> <span>audio file</span>
  </div>
 
 </div>
@@ -529,28 +532,30 @@ soundManager.onerror = function() {
 
 	<div id="col3" class="c3">
 
- 
-  <div id="get-satisfaction" class="box">
-   <div id="gsfn_list_widget">
-    <h2><a href="http://getsatisfaction.com/schillmania/products/schillmania_soundmanager_2/" title="User discussion, FAQs and support for SoundManager 2" rel="nofollow">Discussion / Support</a><span class="l"></span><span class="r"></span></h2>
-    <div id="gsfn_content"></div>
-    <div class="powered_by"><a href="http://getsatisfaction.com/">Get Satisfaction support network</a></div>
-   </div>
-  <!-- /.box -->
+	  <div id="support-wrapper">
+		  <div id="get-satisfaction" class="box">
+		   <div id="gsfn_list_widget">
+		    <h2><a href="http://getsatisfaction.com/schillmania/products/schillmania_soundmanager_2/" title="User discussion, FAQs and support for SoundManager 2" rel="nofollow">Discussion / Support</a><span class="l"></span><span class="r"></span></h2>
+		    <div id="gsfn_content"></div>
+		    <div class="powered_by"><a href="http://getsatisfaction.com/" rel="nofollow">Get Satisfaction support network</a></div>
+		   </div>
+		  <!-- /.box -->
+	  </div>
 
-  </div>
+	</div>
 
  <div id="shortcuts">
 
  </div>
-
-
 
 	</div>
 	
 	<div class="clear"></div>
 
  <!-- /main -->
+ </div>
+
+ <!-- /main-wrapper -->
  </div>
 
  <!-- /content -->
