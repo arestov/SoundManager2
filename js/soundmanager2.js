@@ -30,12 +30,23 @@
 
 (function(window) {
 
+
+var indexOf = function(arr, obj, start) {
+  for (var i = (start || 0); i < arr.length; i++) {
+      if (arr[i] == obj) {
+        return i;
+      }
+    }
+  return -1;
+};
+
+
 var cloneObj= function(acceptor, donor, black_list, white_list){
   //not deep! 
   var _no = acceptor || {};
   for(var a in donor){
-    if (!white_list || white_list.indexOf(a) > -1){
-      if (!black_list || black_list.indexOf(a) == -1){
+    if (!white_list || indexOf(white_list, a) > -1){
+      if (!black_list || indexOf(black_list, a) == -1){
         _no[a] = donor[a];
       }
     }
