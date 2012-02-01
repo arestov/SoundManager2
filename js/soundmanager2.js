@@ -104,7 +104,6 @@ function SoundManager(smURL, smID, opts) {
   this.getC = function() {
     return _this.domContainer;
   };
-
   if (opts && opts === Object(opts)){
     cloneObj(this, opts, false, 
       [
