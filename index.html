@@ -18,6 +18,9 @@
 			function(elem, evType, fn){
 				elem.detachEvent('on' + evType, fn)
 			};
+		var getDefaultView = function(d) {
+			return d.defaultView || d.parentWindow
+		};
 		var domReady = function(d, callback){
 			if (d.readyState == 'complete' || d.readyState == 'loaded'){
 				setTimeout(callback, 30);
@@ -30,7 +33,7 @@
 						
 					}
 				};
-				addEvent(d.defaultView, 'load', f);
+				addEvent(getDefaultView(d), 'load', f);
 				addEvent(d, 'DOMContentLoaded', f);
 			}
 		};
@@ -88,40 +91,46 @@
 
 		};
 
+		var createSoundSample = function(cb) {
+			return {
+				onplay: function(){
+					cb('play', this.sID)
+				},
+				onresume: function(){
+					cb('play', this.sID)
+				},
+				onpause: function(){
+					cb('pause', this.sID)
+				},
+				onstop: function(){
+					cb('stop', this.sID)
+				},
+				onfinish: function(){
+					cb('finish', this.sID)
+				},
+				whileplaying: function(){
+					cb('playing', this.sID, {
+						duration:  (this.bytesTotal * this.duration)/this.bytesLoaded,
+						position: this.position
+					});
+				},
+				whileloading: function(){
+					cb('loading', this.sID, {
+						total: this.bytesTotal,
+						loaded: this.bytesLoaded
+					});
+				},
+				ondataerror: function(){
+					sendMsg('error', this.sID);
+				}
+			};
+		};
+
 		var f_stack = new funcs_queue();
 
-		var soundSample = {
-			onplay: function(){
-				sendMsg('play', this.sID)
-			},
-			onresume: function(){
-				sendMsg('play', this.sID)
-			},
-			onpause: function(){
-				sendMsg('pause', this.sID)
-			},
-			onstop: function(){
-				sendMsg('stop', this.sID)
-			},
-			onfinish: function(){
-				sendMsg('finish', this.sID)
-			},
-			whileplaying: function(){
-				sendMsg('playing', this.sID, {
-					duration:  (this.bytesTotal * this.duration)/this.bytesLoaded,
-					position: this.position
-				});
-			},
-			whileloading: function(){
-				sendMsg('loading', this.sID, {
-					total: this.bytesTotal,
-					loaded: this.bytesLoaded
-				});
-			},
-			ondataerror: function(){
-				sendMsg('error', this.sID);
-			}
-		};
+		var soundSample = createSoundSample(sendMsg);
+
+		
 		
 		var plc = {
 			create: function(s, opts){
