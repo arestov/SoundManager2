@@ -93,6 +93,7 @@
 
 		var createSoundSample = function(cb) {
 			return {
+				multiShot: false,
 				onplay: function(){
 					cb('play', this.sID)
 				},
@@ -121,7 +122,7 @@
 					});
 				},
 				ondataerror: function(){
-					sendMsg('error', this.sID);
+					cb('error', this.sID);
 				}
 			};
 		};
