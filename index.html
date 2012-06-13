@@ -128,7 +128,7 @@
 				onload: function(loaded) {
 					if (!loaded){
 						if (this.readyState == 2){
-							console.log("onload reports error")
+							cb('error', this.sID);
 						}
 					}
 				}
