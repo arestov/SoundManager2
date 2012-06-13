@@ -125,8 +125,8 @@
 				ondataerror: function(){
 					cb('error', this.sID);
 				},
-				onload: function(cache_or_error) {
-					if (cache_or_error){
+				onload: function(loaded) {
+					if (!loaded){
 						if (this.readyState == 2){
 							console.log("onload reports error")
 						}
