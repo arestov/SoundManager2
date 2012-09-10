@@ -170,14 +170,24 @@
 					s.pause();
 				}
 			},
-			setVolume: function(s, vol){
+			setVolume: function(s, vol, fac){
 				if (s){
-					s.setVolume(parseFloat(vol));
+					if (fac){
+						s.setVolume(100 * parseFloat(fac[0])/ parseFloat(fac[1]));
+					} else {
+						s.setVolume(parseFloat(vol));
+					}
+					
 				}
 			},
-			setPosition: function(s, pos){
+			setPosition: function(s, pos, fac){
 				if (s){
-					s.setPosition(parseFloat(pos));
+					if (fac){
+					s.setPosition(((this.bytesTotal * this.duration)/this.bytesLoaded)* parseFloat(fac[0])/ parseFloat(fac[1]));
+						} else {
+						s.setPosition(parseFloat(pos));
+					}
+					
 				}
 			},
 			remove: function(s){
@@ -196,13 +206,13 @@
 				}
 			}
 		};
-		var receiveMsg = function(method, id, opts){
+		var receiveMsg = function(method, id, opts, more_opts){
 			f_stack.add(function(){
 				if (sm2 && method && plc[method] && id){
 					if (opts && opts === Object(opts)){
 						cloneObj(opts, {id: id});
 					}
-					plc[method](sm2.getSoundById(id), opts);
+					plc[method](sm2.getSoundById(id), opts, more_opts);
 				}
 			});
 			
