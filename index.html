@@ -183,7 +183,7 @@
 			setPosition: function(s, pos, fac){
 				if (s){
 					if (fac){
-					s.setPosition(((this.bytesTotal * this.duration)/this.bytesLoaded)* parseFloat(fac[0])/ parseFloat(fac[1]));
+					s.setPosition(((s.bytesTotal * s.duration)/s.bytesLoaded)* parseFloat(fac[0])/ parseFloat(fac[1]));
 						} else {
 						s.setPosition(parseFloat(pos));
 					}
