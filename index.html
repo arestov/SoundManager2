@@ -182,11 +182,32 @@
 			},
 			setPosition: function(s, pos, fac){
 				if (s){
+					var available = s.duration;
+					var wanted;
+					var target_pos;
+					
 					if (fac){
-					s.setPosition(((s.bytesTotal * s.duration)/s.bytesLoaded)* parseFloat(fac[0])/ parseFloat(fac[1]));
-						} else {
-						s.setPosition(parseFloat(pos));
+						wanted = ((s.bytesTotal * s.duration)/s.bytesLoaded)* parseFloat(fac[0])/ parseFloat(fac[1]);
+					} else {
+						wanted = parseFloat(pos)
 					}
+
+					if (wanted > available){
+						if (available > 2000){
+							target_pos = Math.min(available - 2000, wanted);
+						}
+						
+					} else {
+						target_pos = Math.max(0, wanted);
+					}
+
+
+
+					if (target_pos > -1){
+						s.setPosition(target_pos);
+					}
+					
+
 					
 				}
 			},
