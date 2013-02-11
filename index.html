@@ -126,10 +126,13 @@
 					cb('error', this.sID);
 				},
 				onload: function(loaded) {
-					if (this.readyState == 3){
-						cb('error', this.sID);
-					}
 					if (this.readyState == 2){
+						if (!this.duration){
+							cb('error', this.sID);
+						}
+						
+					}
+					if (this.readyState == 3){
 						if (!loaded || !this.duration){
 							cb('error', this.sID);
 							
