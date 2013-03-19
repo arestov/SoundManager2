@@ -67,9 +67,9 @@
 			return full_url;
 		};
 	</script>
-	<script type="text/javascript" src="js/json2.min.js"></script>
-	<script type="text/javascript" src="js/c_quene.js"></script>
-	<script type="text/javascript" src="js/soundmanager2.js"></script>
+	<script type="text/javascript" src="m-js/json2.min.js"></script>
+	<script type="text/javascript" src="m-js/c_quene.js"></script>
+	<script type="text/javascript" src="m-js/soundmanager2.min.js"></script>
 	<script type="text/javascript">
 		var sm2,
 			iframed = window.parent != window;
@@ -284,7 +284,7 @@
 				cloneObj(  sm2opts, opts_from_loc  );
 				
 			}
-			soundManager = new SoundManager('swf', false, sm2opts);
+			soundManager = new SoundManager('m-swf', false, sm2opts);
 			soundManager.onready(function() {
 				if (soundManager.supported()) {
 					console.log('sm2 ok')
