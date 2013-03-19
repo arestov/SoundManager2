@@ -1,0 +1,312 @@
+<html>
+<head>
+	<title>Remote Soundmanager2</title>
+	<script type="text/javascript">
+		var addEvent = window.addEventListener ? 
+			function(elem, evType, fn){
+				elem.addEventListener(evType, fn, false);
+				return fn;
+			}:
+			function(elem, evType, fn){
+				elem.attachEvent('on' + evType, fn);
+				return fn;
+			};
+		var removeEvent = window.addEventListener ?
+			function(elem, evType, fn){
+				elem.removeEventListener(evType, fn, false);
+			}:
+			function(elem, evType, fn){
+				elem.detachEvent('on' + evType, fn)
+			};
+		var getDefaultView = function(d) {
+			return d.defaultView || d.parentWindow
+		};
+		var domReady = function(d, callback){
+			if (d.readyState == 'complete' || d.readyState == 'loaded'){
+				setTimeout(callback, 30);
+			} else{
+				var done;
+				var f = function(){
+					if (!done){
+						done = true;
+						callback();
+						
+					}
+				};
+				addEvent(getDefaultView(d), 'load', f);
+				addEvent(d, 'DOMContentLoaded', f);
+			}
+		};
+
+		var cloneObj= function(acceptor, donor, black_list, white_list){
+		  //not deep! 
+		  var _no = acceptor || {};
+		  for (var a in donor){
+		    if (!white_list || white_list.indexOf(a) > -1){
+		      if (!black_list || black_list.indexOf(a) == -1){
+		        _no[a] = donor[a];
+		      }
+		    }
+		    
+		  }
+		  return _no;
+		};
+		var getUrlParameters= function(str){
+			var url_vars = str.replace(/^\?/,'').split('&');
+			var full_url = {};
+			for (var i=0; i < url_vars.length; i++) {
+				var _h = url_vars[i].split('=');
+				full_url[_h[0]] = _h[1];
+				if (_h[1]){
+					try {
+						full_url[_h[0]] = JSON.parse(_h[1]);
+					} catch (e){}
+				}
+				
+			};
+			return full_url;
+		};
+	</script>
+	<script type="text/javascript" src="migrate-js/json2.min.js"></script>
+	<script type="text/javascript" src="migrate-js/c_quene.js"></script>
+	<script type="text/javascript" src="migrate-js/soundmanager2.js"></script>
+	<script type="text/javascript">
+		var sm2,
+			iframed = window.parent != window;
+
+		var sendMsg = function(name, p1, p2){
+			var args = Array.prototype.slice.call(arguments);
+			if (args.length){
+				if (iframed){
+					window.parent.postMessage(JSON.stringify(args), "*");
+				}
+			}		
+		};
+
+		var sm2Loaded = function(soundManager){
+			if (soundManager){
+				sm2 = soundManager;
+			}
+			sendMsg('sm2loaded', !!soundManager);
+
+		};
+
+		var createSoundSample = function(cb) {
+			return {
+				multiShot: false,
+				volume: 100,
+				onplay: function(){
+					cb('play', this.sID)
+				},
+				onresume: function(){
+					cb('play', this.sID)
+				},
+				onpause: function(){
+					cb('pause', this.sID)
+				},
+				onstop: function(){
+					cb('stop', this.sID)
+				},
+				onfinish: function(){
+					cb('finish', this.sID)
+				},
+				whileplaying: function(){
+					cb('playing', this.sID, {
+						duration:  (this.bytesTotal * this.duration)/this.bytesLoaded,
+						position: this.position
+					});
+				},
+				whileloading: function(){
+					cb('loading', this.sID, {
+						total: this.bytesTotal,
+						loaded: this.bytesLoaded
+					});
+				},
+				ondataerror: function(){
+					cb('error', this.sID);
+				},
+				onload: function(loaded) {
+					if (this.readyState == 2){
+						if (!this.duration){
+							cb('error', this.sID);
+						}
+						
+					}
+					if (this.readyState == 3){
+						if (!loaded || !this.duration){
+							cb('error', this.sID);
+							
+						}
+						
+					}
+					
+				}
+			};
+		};
+
+		var f_stack = new funcs_queue();
+
+		var soundSample = createSoundSample(sendMsg);
+
+		
+		
+		var plc = {
+			create: function(s, opts){
+				if (!s || s.url != opts.url){
+					if (s){
+						s.destroySound()
+					}
+					var sound_options = cloneObj({}, soundSample);
+					sound_options.id = opts.id;
+					sound_options.url = opts.url;
+
+					if (opts.volume){
+						sound_options.volume = parseFloat(opts.volume);
+					}
+					sm2.createSound(sound_options);
+				}
+			},
+			play: function(s){
+				s.play();
+			},
+			stop: function(s){
+				if (s){
+					s.stop();
+				}
+			},
+			pause: function(s){
+				if (s){
+					s.pause();
+				}
+			},
+			setVolume: function(s, vol, fac){
+				if (s){
+					if (fac){
+						s.setVolume(100 * parseFloat(fac[0])/ parseFloat(fac[1]));
+					} else {
+						s.setVolume(parseFloat(vol));
+					}
+					
+				}
+			},
+			setPosition: function(s, pos, fac){
+				if (s){
+					var available = s.duration;
+					var wanted;
+					var target_pos;
+					
+					if (fac){
+						wanted = ((s.bytesTotal * s.duration)/s.bytesLoaded)* parseFloat(fac[0])/ parseFloat(fac[1]);
+					} else {
+						wanted = parseFloat(pos)
+					}
+
+					if (wanted > available){
+						if (available > 2000){
+							target_pos = Math.min(available - 2000, wanted);
+						}
+						
+					} else {
+						target_pos = Math.max(0, wanted);
+					}
+
+
+
+					if (target_pos > -1){
+						s.setPosition(target_pos);
+					}
+					
+
+					
+				}
+			},
+			remove: function(s){
+				if (s){
+					s.destruct();
+				}
+			},
+			load: function(s){
+				if (s){
+					s.load();
+				}
+			},
+			unload: function(s){
+				if (s){
+					s.unload();
+				}
+			}
+		};
+		var receiveMsg = function(method, id, opts, more_opts){
+			f_stack.add(function(){
+				if (sm2 && method && plc[method] && id){
+					if (opts && opts === Object(opts)){
+						cloneObj(opts, {id: id});
+					}
+					plc[method](sm2.getSoundById(id), opts, more_opts);
+				}
+			});
+			
+		};
+		addEvent(window, "message", function(e){
+			
+			var data;
+			if (typeof e.data == 'string'){
+				try {
+					data = JSON.parse(e.data);
+				} catch (e){};
+			} else {
+				data = e.data;
+			}
+
+			
+
+			if (data && data instanceof Array){
+				receiveMsg.apply(null, data);
+			}
+		
+			var data = e.data;
+		//	console.log(data)
+			//e.data
+		});
+
+		(function(){
+			if (location.hash && location.hash.length > 4){
+				var opts_from_loc = getUrlParameters(  location.hash.replace('#', '')  );
+			}
+			var sm2opts = {
+				flashVersion : 9,
+				useFlashBlock : true,
+				debugMode : false,
+				wmode : 'opaque',
+				useHighPerformance : true
+			};
+			if (opts_from_loc){
+				cloneObj(  sm2opts, opts_from_loc  );
+				
+			}
+			soundManager = new SoundManager('migrate-swf', false, sm2opts);
+			soundManager.onready(function() {
+				if (soundManager.supported()) {
+					console.log('sm2 ok')
+					sm2Loaded(soundManager);
+				} else {
+					sm2Loaded();
+					console.log('sm2 notok')
+			
+				}
+			});
+			var doc = window.document;
+			domReady(doc, function() {
+				doc.body.appendChild(soundManager.getC());
+				soundManager.appended();
+			});
+			
+		})();
+
+	</script>
+</head>
+<!-- 16:16 -->
+<body>
+
+</body>
+</html>
