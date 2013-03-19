@@ -542,7 +542,7 @@ function PagePlayer() {
   };
   
   this.withinStatusBar = function(o) {
-    return (self.isChildOfClass(o,'controls'));
+    return (self.isChildOfClass(o,'playlist')) && (self.isChildOfClass(o,'controls'));
   };
 
   this.handleClick = function(e) {
@@ -635,6 +635,7 @@ function PagePlayer() {
           onpause:self.events.pause,
           onresume:self.events.resume,
           onfinish:self.events.finish,
+          type:(o.type||null),
           whileloading:self.events.whileloading,
           whileplaying:self.events.whileplaying,
           onmetadata:self.events.metadata,
@@ -813,10 +814,10 @@ function PagePlayer() {
   };
 
   this.stopSound = function(oSound) {
-    sm._writeDebug('stopping sound: '+oSound.sID);
-    sm.stop(oSound.sID);
+    sm._writeDebug('stopping sound: '+oSound.id);
+    sm.stop(oSound.id);
     if (!isTouchDevice) { // iOS 4.2+ security blocks onfinish() -> playNext() if we set a .src in-between(?)
-      sm.unload(oSound.sID);
+      sm.unload(oSound.id);
     }
   };
 

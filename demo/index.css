@@ -1,19 +1,59 @@
 body {
   background:#fff;
+  color: #272727; /* scandalous. */
   margin:0px;
   padding:0px;
   font:75% "helvetica neue",helvetica,arial,verdana,tahoma,"sans serif";
   /* wacky IE 6 horizontal scrollbar hack */
   _width:99.5%;
+  /* a little fun: transition font size with @media shift. */
+  -moz-transition: font-size 0.1s;
+  -webkit-transition: font-size 0.1s;
+}
+
+@media all and (min-width: 1600px) {
+  /* holy CSS3 media queries, Batman! (in this case, larger screen widths get this rule.) */
+  body {
+    font-size: 90%;
+  }
+  body.home .sm2-speaker {
+    max-width: 226px !important;
+  }
+  /* nav vertical align tweak */
+  #nav > ul > li > strong > a {
+    padding-bottom: 0.5em !important;
+  }
+}
+
+@media all and (min-width: 1800px) {
+  /* holy CSS3 media queries, Batman! (in this case, larger screen widths get this rule.) */
+  body {
+    font-size: 118%;
+  }
+  body.home .sm2-speaker {
+    left: -2.5% !important;
+    margin-left: -15% !important;
+    margin-top: 20px !important;
+  }
 }
 
 body.home {
   min-width: 80em;
 }
 
-body.home,
+body,
+#main-wrapper,
 #nav ul li strong a {
   background: #fff url(../demo/_image/noise.png);
+}
+
+body,
+#main-wrapper,
+#nav ul li strong a {
+  background: #fff url(../demo/_image/tiny_grid.png);
+  background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaAgMAAADUJKRdAAAADFBMVEX8/Pz19fX09PT29vY9qbYoAAAAaElEQVR4Xk2MoREDMRADrzSDBQcEQj71GBw4kBbSQKp4YBBw9PsJyLxtsR2tZNfx/LyPhzX7R1Ue2SfjKlicDKBNdpBXsz790Nj8kUlo+WR47PvEPfY+gb7+kMhm5801EBsLvq/z3v8Apg8pkRmgbrsAAAAASUVORK5CYII=);
+  /* old IE */
+  *background: #fff url(../demo/_image/tiny_grid.png);
 }
 
 /* below block commented out as it crashes YUI Compressor (as of 12/2011) - moved out to make-rollups script. */
@@ -36,6 +76,20 @@ body.home,
 }
 */
 
+@font-face {
+  /**
+   * DejaVu font license
+   * http://dejavu-fonts.org/wiki/index.php?title=Main_Page
+   */
+  font-family: 'DejaVuSansMonoBook';
+  src: url('../demo/_image/dejavusansmono-webfont.eot');
+  src: url('../demo/_image/dejavusansmono-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../demo/_image/dejavusansmono-webfont.woff') format('woff'),
+       url('../demo/_image/dejavusansmono-webfont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 h1,
 h2.special {
   letter-spacing:-0.005em;
@@ -45,6 +99,7 @@ h2.special {
   font-family:"ChunkFive","ChunkFiveRegular","helvetica neue",helvetica,arial,verdana,tahoma,"sans serif";
   letter-spacing:0px;
   font-weight:normal;
+  display:inline;
 }
 
 h1, h2, h3, h4 {
@@ -69,10 +124,26 @@ h2 {
 }
 
 h3 {
-  font-size:1.17em;
-  border-bottom:1px solid #ccc;
-  padding-bottom:0.25em;
-  _margin-top:1.5em; /* fark IE6 */
+  font-size: 1.17em;
+  border-top: 0.25em solid #333;
+  border-bottom: 1px dotted #999;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  _margin-top: 1.5em; /* fark IE6 */
+}
+
+body.home h3 {
+  border-top: 0.25em solid #444;
+  margin-top: 1.25em;
+}
+
+#doc .c2 h3 {
+  position: relative;
+  background: #333;
+  color: #fff;
+  padding: 0.25em 0.75em;
+  border: none;
+  line-height: 1.4em; /* windoze alignment */
 }
 
 h3,
@@ -112,14 +183,20 @@ body.home #about-header {
   position: relative;
   margin-left: 18%;
   min-height: 175px;
+  padding-top: 1.75em;
+}
+
+body.home #about-header .feature {
+ /* special alignment tweak */
+ position: relative;
+ top: -0.25em;
+ vertical-align: middle;
 }
 
 body.home .sm2-speaker {
   position: absolute;
   left: -1.5%;
   top: 0px;
-  margin-top: -20px;
-  *margin-top: 0px; /* IE 7 buggery */
   margin-right: 2em;
   margin-bottom: 8px;
   max-width: 192px;
@@ -130,7 +207,7 @@ body.home .sm2-speaker {
 
 body.home .sm2-speaker img {
   width:100%;
-  max-width:192px;
+  max-width:226px;
   min-width:32px;
 }
 
@@ -156,6 +233,15 @@ body.home #about-sm2 h3 {
 
 body.home #about-sm2 h3 {
   font-size: 2.25em;
+}
+
+body.home #about-sm2 b {
+ font-weight: 500;
+}
+
+body.home #about-sm2 strong {
+ font-weight: 500;
+ color: #333;
 }
 
 #col3 a.button, /* "newer version available" */
@@ -238,12 +324,14 @@ body.home #about-sm2 h3 + h4 {
 	font-size: 1.25em;
 	font-weight: 400;
 	margin-bottom: 2em;
+	border-bottom: 1px dotted #b0b0b0;
+	padding-bottom: 0.75em;
 }
 
 body.home .demo-more,
 body.home .demo-more-abs {
   text-align:right;
-  font-size:x-small;
+  font-size:85%;
   margin-right:0.25em;
   white-space:nowrap;
 }
@@ -274,7 +362,6 @@ pre {
 
 dl pre {
   border-color:#e9f3ff;
-  margin-left:-0.5em;
 }
 
 dl.alt pre {
@@ -287,8 +374,9 @@ pre code,
 .code,
 .code-block,
 dt,
-#soundmanager-debug {
-  font-family:monaco,"Andale Mono","VT-100","Lucida Console","Courier New",monospace,courier,system,sans-serif;
+#soundmanager-debug,
+.c3 ul li ul li {
+  font-family:"DejaVu Sans Mono","DejaVuSansMonoBook",monaco,"Andale Mono","VT-100","Lucida Console","Courier New",monospace,courier,system,sans-serif;
 }
 
 pre,
@@ -296,15 +384,27 @@ code,
 .code,
 dt,
 #soundmanager-debug {
-  font-size:12px;
   font-weight:normal;
   line-height:auto;
   color:#006699;
   background:#f6fcff;
 }
 
+pre,
+#soundmanager-debug {
+  font-size: 100%;
+}
+
+body.home p code {
+  font-size: 91%;
+}
+
+pre code {
+  /* don't scale further down, of course... */
+  font-size: 100%;
+}
+
 pre {
-  font-size:12px; /* small or x-small */
   line-height:1.75em;
 }
 
@@ -312,8 +412,8 @@ pre.specialcommentblock span span {
   *line-height:1.75em;
 }
 
-pre.small {
-  font-size:90%;
+.block.small {
+  font-size:92%;
 }
 
 p pre,
@@ -325,7 +425,7 @@ p.in pre {
   background:#fff;
   padding-left:0.75em;
   border:2px solid #ddeeff;
-  font-size:12px;
+  font-size: 85%;
   line-height:1.7em;
 }
 
@@ -345,7 +445,7 @@ body.home #soundmanager-debug {
   border-radius:3px;
   background:#f3f9ff;
   z-index:10;
-  font-size:small;
+  font-size: 85%;
   line-height:1.2em;
 }
 
@@ -356,7 +456,7 @@ body.home #soundmanager-debug div {
 #soundmanager-debug div {
   margin:0px;
   padding:0.25em 0px;
-  font-size:12px;
+  font-size: 100%;
   color:#333;
 }
 
@@ -431,29 +531,43 @@ pre.block code,
   background:#fff;
   border:1px solid #ccddee;
   padding:0.5em;
-  font-size:12px;
+  font-size: 100%;
   line-height:1.75em;
+  background-image: -webkit-linear-gradient(#fcfcfc 50%, #fff 50%);
+  background-image: -o-linear-gradient(#fcfcfc 50%, #fff 50%);
+  background-image: linear-gradient(#fcfcfc 50%, #fff 50%);
+  background-size: 100% 3.5em;
+  background-origin: content-box;
+}
+
+#sm2-properties .code {
+ /* special case: no zebra striping for this one. */
+ background-image: none;
+}
+
+pre.block code {
+  padding: 1em;
 }
 
 dl {
   background:#f9fcff;
-  padding-bottom:1px;
+  padding-bottom: 1px;
+  border: 1px solid #ccddee;
+  border-radius: 3px;
+  margin-top: 1em;
 }
 
 dd {
   margin:1em 0px;
-  padding:0px 0.5em;
-  line-height:1.5em;
+  padding:0px 1em;
+  line-height:1.75em;
 }
 
 dt {
-  margin:0px;
   padding:0px;
-  margin:0.5em 0px 1em 0px;
+  margin:0px;
   border-bottom:1px solid #ddeeff;
-  padding:0.3em 0.3em 0.4em 0.3em;
-  padding-top:0.5em;
-  text-indent:0.25em;
+  padding:0.5em 0.5em 0.5em 0.75em;
   background:#eef6ff;
   font-size:1.15em;
 }
@@ -463,9 +577,23 @@ dt.alt {
   border-bottom-color:#e6e6e6;
 }
 
+dl:nth-child(2n+1),
 dl.alt {
   background:#fcfcfc;
   padding:0px 0px 1px 0px;
+  border-color:#ddd;
+}
+
+dl.tight dt.alt {
+  background: #fcfcfc;
+}
+
+#smsound-methods dl a {
+  font-weight: normal;
+}
+
+#smsound-methods dt:last-of-type {
+  border-bottom: none;
 }
 
 h2 {
@@ -511,7 +639,6 @@ h2 {
 
 #main-wrapper {
   position: relative;
-  background: #fff url(../demo/_image/noise.png);
   /* fade out the body texture */
   /*
   border: 1px solid #fff;
@@ -544,7 +671,7 @@ body.home #main {
   position:relative;
   margin:0px;
   padding:0px;
-  margin:2em 0.5em 0.5em 1em; /* slight left tweak */
+  margin:1.9em 0.5em 0.5em 1em; /* slight left tweak */
 }
 
 .columnar .c1 {
@@ -583,15 +710,12 @@ body.home #main {
 }
 
 .columnar .c1 p code {
-  font-size:x-small;
   color:#336699;
 }
 
 .columnar .c2 {
   position:relative;
-  margin-top:2.33em;
-  margin-top:1px;
-  border-top:0.25em solid #333;
+  margin-top:0px;
   margin-left:22em;
   margin-bottom:1.5em;
 }
@@ -607,6 +731,12 @@ body.home #main {
   _margin-right:0px; /* not you, IE 6. */
 }
 
+#doc.special .triple .columnar .c2 {
+  /* override case: make c2 extra-wide. */
+  margin-right: 0.75em;
+  max-width: 70em;
+}
+
 #doc .triple .columnar .c1 {
   margin-right:0px;
   margin-left:21.25em;
@@ -614,12 +744,6 @@ body.home #main {
 
 .columnar .c2 p:first-child {
   margin-top:0.2em;
-}
-
-.columnar .c2 h3:first-child {
-  margin-top:0.2em;
-  padding-bottom:0.3em;
-  font-weight:bold;
 }
 
 .columnar .c2 > .f-block:first-child > h4 {
@@ -635,7 +759,9 @@ body.home #main {
 }
 
 .columnar .c2 p {
-  line-height:1.65em;
+  line-height:1.75em;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
 }
 
 .three .columnar {
@@ -784,7 +910,7 @@ ul {
   float:right;
   display:inline;
   margin-left:1em;
-  font-size:x-small;
+  font-size:85%;
   margin-bottom:0px;
   margin-top:0.45em;
   color:#999;
@@ -838,10 +964,6 @@ ul.standard ul {
   padding-left:1.2em;
 }
 
-.c3 {
-  background:#fcfcfc;
-}
-
 .c3 ul {
   list-style-type:none;
 }
@@ -860,21 +982,33 @@ ul.standard ul {
 .c3 ul li a {
   display: block;
   text-decoration:none;
-  color:#000;
+  line-height: 21px;
 }
 
-.c3 ul li a:hover {
-  color:#000;
-  _color:#000;
-}
-
+.c3 ul li,
+.c3 ul li a,
+.c3 ul li a:hover,
 .c3 ul li a:focus {
-  color:#000;
+  color:#222;
+  _color:#222;
   outline:none;
 }
 
+.c3 ul li.active {
+  box-shadow: 0 0 6px #003366 inset;
+  border-radius: 1px;
+}
+
 .c3 ul li.active a {
-  color:#fff;
+  border-radius: 2px;
+  text-shadow: 0px 1px 0px rgba(0,0,0,0.25);
+}
+
+.c3 ul li.active,
+.c3 ul li.active a,
+.c3 ul li ul li:hover,
+.c3 ul li ul li:hover a {
+  color: #fff;
 }
 
 .c3 ul li.active a:hover {
@@ -899,6 +1033,11 @@ ul.standard ul {
 .c3 h2 {
   height:2em;
   line-height:2em;
+}
+
+.c3 h2,
+#doc .c2 h3 {
+  text-shadow: 0px 1px 0px #000;
 }
 
 .wedge {
@@ -963,10 +1102,10 @@ ul.standard ul {
 }
 
 .wedge .r {
-  margin-top:-16px;
+  margin-top:-15px;
   border-top:none;
   height:16px;
-  border-bottom:1.7em solid #3399cc;
+  border-bottom:2em solid #3399cc;
   background-position:0px -192px;
 }
 
@@ -1001,8 +1140,6 @@ ul.standard ul {
 .c3 ul {
   margin:0px;
   padding:0px;
-  margin-top:0.125em;
-  margin-bottom:0.25em;
   list-style-type:none;
 }
 
@@ -1022,20 +1159,18 @@ ul.standard ul {
 }
 
 .c3 ul li ul li {
-  font-family:monaco,"Andale Mono","VT-100","Lucida Console","Courier New",monospace,courier,system,sans-serif;
-  font-size:12px;
+  background-color: #fcfcfc;
+  background-color: rgba(255,255,255,0.5);
+  font-size: 100%;
   line-height:1.5em;
   text-indent:0.5em;
   padding:0.25em 0.25em 0.25em 0.25em;
   cursor:hand;
-}
-
-.c3 ul li ul li.alt {
-  background-color:#f8f8f8;
+  border-bottom: 1px dotted #eee;
 }
 
 .c3 ul li ul li:hover {
-  background-color:#ccddff;
+  background-color:#999;
   cursor:pointer;
   cursor:hand;
 }
@@ -1046,30 +1181,34 @@ ul.standard ul {
 }
 
 .c3 h3 {
-  margin:0px;
-  padding:0px;
-  background:#3399cc;
-  border:none;
-  color:#fff;
-  font-size:1.3em;
-  text-indent:0.5em;
-  font-size:1em;
-  height:1.67em;
-  padding:0.25em 0.5em;
-  padding:0px;
+  margin: 0px;
+  padding: 0px;
+  height: auto;
+  min-height: 25px;
+  background: #3399cc;
+  border: none;
+  color: #fff;
+  text-indent: 0.5em;
+  font-size: 1em;
+  line-height: 2em;
+  text-shadow: 0px 1px 0px rgba(0,0,0,0.25);
 }
 
 .c3 h4 {
   font-size:1em;
-  margin:1em 0.25em 0.25em 0.25em;
-  padding:0px 0.25em;
-  padding:0.2em 0.2em 0.2em 0.5em;
-  vertical-align:middle;
   margin:0px;
+  padding:0.4em 0.2em 0.4em 0.75em;
+  vertical-align:middle;
   color:#333;
-  background:#eef6ff;
-  border-top:1px solid #fff;
-  border-bottom:1px solid #ddeeff;
+  background-color: #f3f3f3;
+  background-color: rgba(0,0,0,0.05);
+  border-top: 1px dotted #d6d6d6;
+  border-bottom: 1px dashed #e9e9e9;
+  text-shadow: 0px 1px 0px #fff;
+}
+
+.c3 h4:first-of-type {
+  border-top-color: transparent;
 }
 
 #get-satisfaction h2 a {
@@ -1104,6 +1243,7 @@ li.flash9 {
   background-position:bottom right;
 }
 
+.flash9:hover,
 .flash9.active {
   background-image:url(../demo/_image/flash9-dark.png);
   _background-image:none;
@@ -1123,19 +1263,19 @@ li.flash9 {
   _background-image:none;
 }
 
-.deprecated {
-  font-style: italic;
-  color: #333 !important;
-}
-
+.new:hover,
 .new.active,
+.recent:hover,
 .recent.active {
   background-image:url(../demo/_image/new-dark.png);
+  background-repeat:no-repeat;
+  background-position:bottom right;
   _background-image:none;
 }
 
-li.new {
-  background-position:top right;
+.deprecated {
+  font-style: italic;
+  color: #333 !important;
 }
 
 span.nevermind,
@@ -1160,13 +1300,12 @@ dd.deprecation-note {
 
 .c3 p {
   font-size:0.9em;
-  padding-left:0.5em;
+  padding-left:0.75em;
   padding-right:0.5em;
 }
 
 .c1 pre code {
   margin-top:0px;
-  font-size:x-small;
   color:#336699;
   margin-left:0px;
 }
@@ -1186,7 +1325,7 @@ dd.deprecation-note {
 }
 
 .c2 .option {
-  font-size:small;
+  font-size:85%;
   float:right;
   display:inline;
   margin-left:1em;
@@ -1261,7 +1400,7 @@ div#gsfn_list_widget .powered_by {
   margin:-0.25em 1em 0px 1em;
   padding:0.25em 0px 0.5em 0px;
   border-top: 1px dotted #ddd;
-  font-size:xx-small;
+  font-size:75%;
 }
 
 body.home div#gsfn_list_widget .powered_by {
@@ -1278,7 +1417,7 @@ div#gsfn_list_widget .powered_by a:hover {
 }
 
 div#gsfn_list_widget div#gsfn_content {
-  font-size:x-small;
+  font-size:85%;
   font-size:0.9em;
   padding-left:0.5em;
   padding-right:0.5em;
@@ -1309,7 +1448,7 @@ div#gsfn_list_widget div#gsfn_content a.gsfn_link:hover {
 }
 
 div#gsfn_list_widget div#gsfn_content span.time {
-  font-size: xx-small;
+  font-size: 85%;
   color:#999;
   padding-left:3px;
   padding-right:3px;
@@ -1334,7 +1473,12 @@ div#gsfn_list_widget div#gsfn_content p.gsfn_summary {
 }
 
 .compact {
-  margin-bottom:0.25em;
+  margin-bottom:0.25em !important;
+}
+
+.smaller {
+ margin-top: 0px !important;
+ margin-bottom: 0.25em !important;
 }
 
 .c2 a,
@@ -1350,7 +1494,16 @@ a.cta {
   color:#3399cc;
   border-radius:0.25em;
   zoom:1;
-  text-shadow: none;
+}
+
+body.home .c2 a,
+body.home a.cta {
+ text-shadow: 0px 1px 0px #fff;
+}
+
+body.home .c2 a:hover,
+body.home a.cta:hover {
+ text-shadow: none;
 }
 
 /* redefine for simple mp3 button demo */
@@ -1391,6 +1544,10 @@ a.cta:hover,
 .c2 a.sm2_button:hover {
   /* arg. not specific enough, redefine here. */
   background-color:#cc3333;
+}
+
+dt a:hover span {
+	color: #fff;
 }
 
 a.cta-more {
@@ -1465,11 +1622,10 @@ a.feature,
   border:3px solid #cce6ff;
   border:3px solid rgba(255,255,255,0.66);
   border-radius:8px;
+  font-size: 1.1em;
   line-height:1em;
   *line-height:1.1em;
   text-decoration:none;
-  font-size:small;
-  /* would use vertical-align: middle here, but it screws up display inside <h2> for IE 9+ */
 }
 
 a.feature {
@@ -1497,7 +1653,7 @@ a.feature:hover {
   border-color:#ff6666;
   color:#fff;
 }
-
+#
 a.warning,
 span.warning {
   font-weight:bold;
@@ -1607,14 +1763,8 @@ ul.inthewild a span {
 #audiogalaxy {
   width: 100px;
   height: 22px;
-  background-position: 0 -24px;
+  background-position: 0 -37px;
   margin: -11px 0px 0px -50px;
-}
-
-div.inthewild.active #audiogalaxy,
-div.inthewild:hover #audiogalaxy,
-#audiogalaxy:hover {
-  background-position: 0 -46px;
 }
 
 #discogs {
@@ -1625,109 +1775,67 @@ div.inthewild:hover #audiogalaxy,
 }
 
 #hypem {
-  background-position: 0 -96px;
+  background-position: 0 -111px;
   width: 80px;
   height: 38px;
   margin: -19px 0px 0px -40px;
 }
 
-div.inthewild.active #hypem,
-div.inthewild:hover #hypem,
-#hypem:hover {
-  background-position: 0 -134px;
-}
-
 #lastfm {
-  background-position: 0 -204px;
+  background-position: 0 -176px;
   width: 80px;
   height: 28px;
   margin: -14px 0px 0px -40px;
 }
 
-div.inthewild.active #lastfm,
-div.inthewild:hover #lastfm,
-#lastfm:hover {
-  background-position: 0 -176px;
-}
-
-#nyancat {
-  background-position: 0 -272px;
-  width: 64px;
-  height: 40px;
-  margin: -20px 0px 0px -32px;
-}
-
-div.inthewild.active #nyancat,
-div.inthewild:hover #nyancat,
-#nyancat:hover {
-  background-position: 0 -312px;
-}
-
-#opera {
-  background-position: 0 -356px;
-  width: 79px;
-  height: 32px;
-  margin: -16px 0px 0px -40px;
-}
-
-div.inthewild.active #opera,
-div.inthewild:hover #opera,
-#opera:hover {
-  background-position: 0 -388px;
-}
-
-#soundcloud {
-  background-position: 0 -483px;
-  width: 83px;
-  height: 58px;
-  margin: -29px 0px 0px -42px;
-}
-
-div.inthewild.active #soundcloud,
-div.inthewild:hover #soundcloud,
-#soundcloud:hover {
-  background-position: 0 -424px;
-}
-
-#turntable-dot-fm {
-  background-position: 0 -232px;
+#pitchfork {
+  background-position: 0 -688px;
   width: 100px;
   height: 20px;
   margin: -10px 0px 0px -50px;
 }
 
-div.inthewild.active #turntable-dot-fm,
-div.inthewild:hover #turntable-dot-fm,
-#turntable-dot-fm:hover {
+#nyancat {
+  background-position: 0 -312px;
+  width: 64px;
+  height: 40px;
+  margin: -20px 0px 0px -32px;
+}
+
+#opera {
+  background-position: 0 -373px;
+  width: 79px;
+  height: 32px;
+  margin: -16px 0px 0px -40px;
+}
+
+#soundcloud {
+  background-position: 0 -424px;
+  width: 83px;
+  height: 58px;
+  margin: -29px 0px 0px -42px;
+}
+
+#turntable-dot-fm {
   background-position: 0 -252px;
+  width: 100px;
+  height: 20px;
+  margin: -10px 0px 0px -50px;
 }
 
 #baroque-me {
-  background-position: 0 -588px;
+  background-position: 0 -541px;
   width: 88px;
   height: 47px;
   margin: -23px 0px 0px -42px;
 }
 
-div.inthewild.active #baroque-me,
-div.inthewild:hover #baroque-me,
-#baroque-me:hover {
-  background-position: 0 -541px;
-}
-
 #freesound {
-  background-position: 0 -662px;
+  background-position: 0 -635px;
   width: 100px;
   height: 27px;
   margin: -15px 0px 0px -50px;
 }
-
-div.inthewild.active #freesound,
-div.inthewild:hover #freesound,
-#freesound:hover {
-  background-position: 0 -635px;
-}
-
 
 div.inthewild.active li:hover {
   background-color: rgba(255,255,255,0.9);
@@ -1738,12 +1846,12 @@ div.inthewild.active li:hover {
 /* homepage-specific demo shiz */
 
 .sidenote {
-  font-size:x-small;
+  font-size:85%;
   opacity:0.75;
 }
 
 ul.playlist {
-  font-size:xx-small;
+  font-size:85%;
 }
 
 ul.playlist li {
@@ -1764,7 +1872,7 @@ ul.playlist li a:hover {
 
 ul.playlist li .timing {
   margin-right: 0.1em;
-  font-size: xx-small;
+  font-size: 50%;
   top: 0.5em;
 }
 
@@ -2267,12 +2375,12 @@ ul.file-structure li span {
 }
 
 #sm2-options .options-divider {
-  font-size: xx-small;
+  font-size: 85%;
   color: #ccc;
 }
 
 #sm2-options p {
-  font-size: x-small;
+  font-size: 85%;
   padding-left: 0px;
   padding-bottom: 0px;
   margin-bottom: 0.75em;
@@ -2314,6 +2422,7 @@ ul.code-block {
   list-style-type: none;
   position: relative;
   padding: 3px;
+  font-size: 85%;
 }
 
 ul.code-block,
@@ -2321,16 +2430,15 @@ ul.code-block li {
   position: relative;
   margin: 0px;
   padding: 0px;
-  font-size: 11px;
-  line-height: 16px;
+  line-height: 1.5em;
 }
 
 ul.code-block li {
-  padding: 0.75em 0px;
+  padding: 0.75em 0.5em;
 }
 
 ul.code-block li:nth-child(2n+1) {
-  background-color: #f9fcff;
+  background-color: #fcfcfc;
 }
 
 ul.code-block li:last-child {
@@ -2339,16 +2447,16 @@ ul.code-block li:last-child {
 
 ul.code-block li div {
   position: absolute;
-  left: 0px;
+  left: 0.5em;
   top: 0.75em; /* note: match LI padding */
-  width: 28em; /* left gutter */
+  width: 22em; /* left gutter */
   z-index: 2; /* sit on top */
 }
 
 ul.code-block li span {
   position: relative;
   display: block;
-  padding-left: 29em; /* room for left gutter */
+  padding-left: 22.5em; /* room for left gutter */
   text-indent: -2em;
 }
 
@@ -2406,7 +2514,9 @@ div.threeup .column {
 div.oneup .column-wrapper,
 div.twoup .column-wrapper,
 div.threeup .column-wrapper {
+/*
   border-top: 1px dotted #d0d0d0;
+*/
   margin: 0px 2.5em;
 }
 
@@ -2435,7 +2545,7 @@ body.home #main .threeup p {
 
 body.home #main p.sidenote {
   /* disclaimer */
-  font-size: x-small;
+  font-size: 92%;
   color: #666;
 }
 
@@ -2471,7 +2581,7 @@ body.home .sm2-inline-list .ui360-vis {
 }
 
 body.home ul.playlist {
-  font-size: x-small;
+  font-size: 85%;
 }
 
 body.home ul.playlist li {
@@ -2480,7 +2590,7 @@ body.home ul.playlist li {
 }
 
 body.home ul.playlist .sidenote {
-  font-size: x-small;
+  font-size: 85%;
   letter-spacing: 0px;
 }
 
@@ -2522,6 +2632,11 @@ body.home .feature-hot,
 body.home #html5-support-li span {
   /* take out shadow on most demo links */
   text-shadow: none;
+}
+
+body.home .feature-hot {
+ /* hack: font size fix */
+ font-size: 13px;
 }
 
 body.home ul.graphic li a,
@@ -2757,19 +2872,11 @@ div.icons ul li.package {
 .bonus-demos li {
  float: left;
  display: inline;
- width: 48%;
- margin-right: 2%;
+ width: 32%;
+ margin-right: 1%;
  text-align: center;
 }
 
-.bonus-demo a,
-.bonus-demos li a {
- opacity: 0.85;
- -moz-transition: 0.2s opacity ease-in-out;
- -webkit-transition: 0.2s opacity ease-in-out;
-}
-
-.bonus-demo a:hover,
-.bonus-demos li a:hover {
- opacity: 1;
+.bonus-demos li img {
+ border-radius: 4px;
 }

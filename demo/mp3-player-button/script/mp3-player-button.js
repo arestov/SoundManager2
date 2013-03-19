@@ -24,8 +24,8 @@ function BasicMP3Player() {
   this.excludeClass = 'button-exclude'; // CSS class for ignoring MP3 links
   this.links = [];
   this.sounds = [];
-  this.soundsByURL = [];
-  this.indexByURL = [];
+  this.soundsByURL = {};
+  this.indexByURL = {};
   this.lastSound = null;
   this.soundCount = 0;
 
@@ -182,7 +182,7 @@ function BasicMP3Player() {
       } else {
         // different sound
         thisSound.togglePause(); // start playing current
-        sm._writeDebug('sound different than last sound: '+self.lastSound.sID);
+        sm._writeDebug('sound different than last sound: '+self.lastSound.id);
         if (self.lastSound) {
           self.stopSound(self.lastSound);
         }
@@ -196,7 +196,8 @@ function BasicMP3Player() {
        onstop:self.events.stop,
        onpause:self.events.pause,
        onresume:self.events.resume,
-       onfinish:self.events.finish
+       onfinish:self.events.finish,
+       type:(o.type||null)
       });
       // tack on some custom data
       thisSound._data = {
@@ -216,9 +217,9 @@ function BasicMP3Player() {
   };
 
   this.stopSound = function(oSound) {
-    soundManager.stop(oSound.sID);
+    soundManager.stop(oSound.id);
     if (!isTouchDevice) { // iOS 4.2+ security blocks onfinish() -> playNext() if we set a .src in-between(?)
-      soundManager.unload(oSound.sID);
+      soundManager.unload(oSound.id);
     }
   };
 

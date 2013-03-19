@@ -14,12 +14,12 @@
 <script type="text/javascript" src="../../script/soundmanager2.js"></script>
 <script type="text/javascript" src="../../demo/index.js"></script>
 <script type="text/javascript">
-	soundManager.debugMode = true;
-	soundManager.consoleOnly = false;
-	soundManager.debugFlash = true;
-	soundManager.url = '../../swf/';
-	soundManager.onload = function() {
-	}
+soundManager.setup({
+  url: '../../swf/',
+  debugMode: true,
+  consoleOnly: false,
+  debugFlash: true
+});
 </script>
 </head>
 
@@ -41,6 +41,7 @@
 	  <li>
 	   <a href="#">Demos</a>
 	   <ul>
+		<li><a href="../../demo/template/">Basic Template</a></li>
 		<li><a href="../../demo/api/">API Examples</a></li>
 	    <li><a href="../../demo/play-mp3-links/" class="exclude">Playable MP3 links</a></li>
 	    <li><a href="../../demo/mp3-player-button/" class="exclude">Basic MP3 Play Button</a></li>
@@ -49,7 +50,6 @@
 	    <li><a href="../../demo/mpc/">Drum Machine (MPC)</a></li>
 		<li><a href="../../demo/animation/">DOM/Animation Demos</a></li>
 		<li><a href="../../demo/flashblock/">FlashBlock Handling</a></li>
-		<li><a href="../../demo/template/">Basic Template</a></li>
 	   </ul>
 	  </li>
 
@@ -147,7 +147,8 @@
 			  <ul>
 			   <li>Firefox (all versions), Windows/Mac</li>
 			   <li>Safari 1.3+ (Mac) / All Windows versions</li>
-			   <li>Mobile Webkit: iOS 4.0 devices, or iPad 3.2+</li>
+			   <li>Mobile Webkit: iOS 4.0 devices, iPad 3.2 (original iPad iOS release) and newer</li>
+			   <li>Android (2.3+, confirmed on 2.3.3.)</li>
 			   <li>Google Chrome (all versions/OSes)</li>
 			   <li>Internet Explorer 5.0+, Windows</li>
 			   <li>Opera 9.10 (slightly buggy, 9.5+ ideal), Windows/Mac</li>
@@ -183,7 +184,7 @@
 
 			  <h4>Flash 8 limitations with multiShot (overlaying/"chorus") effects</h4>
 			  <p class="in">Regarding "layering" sounds (calling <code>play()</code> on a sound multiple times): Even though a multi-shot option can be specified, it does not work with Flash 8; a single instance of a sound can only have one timeline. The current behaviour is that when <code>multiShot</code> is specified and <code>play()</code> is called on a currently-playing sound, it will restart from the beginning without an overlay.</p>
-			  <p>However, the API does provide some creative ways (<code class="in">onbeforefinish</code> for looping, multiple sound objects for multi-shot layering) of working around these Flash limitations.</p>
+			  <p>However, the API does provide some creative ways (<code>onfinish</code> for looping, multiple sound objects for multi-shot layering) of working around these Flash limitations.</p>
 			  <p>It should be noted that sounds can loop seamlessly and be layered when linked and exported to SWF from within the Flash IDE, but SoundManager does not support SWF-based audio.</p>
 
 			  <h4>Flash 9 multiShot capabilities</h4>
@@ -201,7 +202,7 @@
 			  <p>JavaScript-to-Flash communication is not instantaneous on slower systems, but can be much better on more modern systems. Latency (timing lag/delays) can be noted in some cases from function call to sound execution. It is possible some performance analysis can help to speed up this area for timing-critical applications involving animation etc., but this area has not been thoroughly investigated yet. Brad Neuberg has some notes on <a href="http://codinginparadise.org/weblog/2006/02/how-to-speed-up-flash-8s.html" title="Brad Neuberg - How To Speed Up ExternalInterface">speeding up ExternalInterface</a> which may be relevant.</p>
 			  <p>Flash-to-OS/hardware latency (where flash reports progress, but no sound is heard for a number of milliseconds) may also be an unfortunate reality of Flash-based audio, varying between platform and OS version etc.</p>
 			  <p>Additionally, MP3 files may contain audible gaps at the beginning or end by default when encoded, even if the source (eg. WAVE) file did not. Using optional "nogap" encoding options with programs such as LAME may help to remedy this.</p>
-			  <p>Finally, the <code class="in">useHighPerformance</code> option may help with JS/flash lag. Using this option causes the flash movie to be placed with position:fixed on-screen at all times (though in a small, hidden box) and has been shown to notably improve performance on Mac OS X. As well, <code class="in">useFastPolling</code> will use a lower timer interval within Flash, making polling calls run as quickly as reasonably possible and increasing the frequency of calls to <code class="in">whileplaying()</code>, <code class="in">whileloading()</code> and other time-related events.</p>
+			  <p>Finally, the <code class="in">useHighPerformance</code> option may help with JS/flash lag. Using this option causes the flash movie to be placed with position:fixed on-screen at all times (though in a small, hidden box) and has been shown to notably improve performance on Mac OS X. As well, <code class="in">flashPollingInterval</code> will use a lower timer value, making polling calls run as quickly as reasonably possible and increasing the frequency of calls to <code class="in">whileplaying()</code>, <code class="in">whileloading()</code> and other time-related events.</p>
 
 			  </div>
 
