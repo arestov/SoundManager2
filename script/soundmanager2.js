@@ -34,6 +34,34 @@
 
 "use strict";
 
+
+var indexOf = function(arr, obj, start) {
+  if (arr.indexOf){
+    return arr.indexOf.call(arr, obj, start);
+  }
+  for (var i = (start || 0); i < arr.length; i++) {
+      if (arr[i] == obj) {
+        return i;
+      }
+    }
+  return -1;
+};
+
+
+var cloneObj= function(acceptor, donor, black_list, white_list){
+  //not deep! 
+  var _no = acceptor || {};
+  for(var a in donor){
+    if (!white_list || indexOf(white_list, a) > -1){
+      if (!black_list || indexOf(black_list, a) == -1){
+        _no[a] = donor[a];
+      }
+    }
+    
+  }
+  return _no;
+};
+
 var soundManager = null;
 
 /**
@@ -46,7 +74,7 @@ var soundManager = null;
  * @return {SoundManager} The new SoundManager instance
  */
 
-function SoundManager(smURL, smID) {
+function SoundManager(smURL, smID, opts) {
 
   /**
    * soundManager configuration options list
@@ -77,6 +105,39 @@ function SoundManager(smURL, smID) {
     'noSWFCache': false                 // if true, appends ?ts={date} to break aggressive SWF caching.
 
   };
+  
+  this.domContainer = document.createElement('div');
+
+  var _this = this;
+  this.getC = function() {
+    return _this.domContainer;
+  };
+  if (opts && opts === Object(opts)){
+    cloneObj(this.setupOptions, opts, false,
+      [
+        'url',
+        'flashVersion',
+        'debugMode',
+        'debugFlash',
+        'useConsole',
+        'consoleOnly',
+        'waitForWindowLoad',
+        'bgColor',
+        'useHighPerformance',
+        'flashPollingInterval',
+        'html5PollingInterval',
+        'flashLoadTimeout',
+        'wmode',
+        'allowScriptAccess',
+        'useFlashBlock',
+        'useHTML5Audio',
+        'html5Test',
+        'preferFlash',
+        'noSWFCache',
+      ]);
+  }
+
+  
 
   this.defaultOptions = {
 
@@ -4284,7 +4345,7 @@ function SoundManager(smURL, smID) {
 
       if (sm2.debugMode && !id(oD.id)) {
         try {
-          oTarget = getDocument();
+          oTarget = _s.domContainer;
           oTarget.appendChild(oD);
         } catch(e2) {
           throw new Error(str('domError')+' \n'+e2.toString());
@@ -5035,8 +5096,8 @@ function SoundManager(smURL, smID) {
     }
 
     initDebug();
-    extraClass = getSWFCSS();
-    oTarget = getDocument();
+    extraClass = _getSWFCSS();
+    oTarget = _s.domContainer;
 
     if (oTarget) {
 
@@ -5649,6 +5710,8 @@ function SoundManager(smURL, smID) {
   // sniff up-front
   detectFlash();
 
+  /*
+
   // focus and window load, init (primarily flash-driven)
   event.add(window, 'focus', handleFocus);
   event.add(window, 'load', delayWaitForEI);
@@ -5668,7 +5731,12 @@ function SoundManager(smURL, smID) {
     debugTS('onload', false);
     catchError({type:'NO_DOM2_EVENTS', fatal:true});
 
-  }
+  }*/
+
+  this.appended = function() {
+    domContentLoaded();
+    return this;
+  };
 
 } // SoundManager()
 
