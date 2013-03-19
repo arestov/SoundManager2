@@ -5096,8 +5096,8 @@ function SoundManager(smURL, smID, opts) {
     }
 
     initDebug();
-    extraClass = _getSWFCSS();
-    oTarget = _s.domContainer;
+    extraClass = getSWFCSS();
+    oTarget = _this.domContainer;
 
     if (oTarget) {
 
