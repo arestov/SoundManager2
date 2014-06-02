@@ -74,11 +74,14 @@
 		var sm2,
 			iframed = window.parent != window;
 
+
+		var modern_messaging;
+
 		var sendMsg = function(name, p1, p2){
 			var args = Array.prototype.slice.call(arguments);
 			if (args.length){
 				if (iframed){
-					window.parent.postMessage(JSON.stringify(args), "*");
+					window.parent.postMessage(modern_messaging ? args : JSON.stringify(args), "*");
 				}
 			}		
 		};
@@ -282,7 +285,7 @@
 			};
 			if (opts_from_loc){
 				cloneObj(  sm2opts, opts_from_loc  );
-				
+				modern_messaging = !!opts_from_loc.modern_messaging;
 			}
 			soundManager = new SoundManager('m-swf', false, sm2opts);
 			soundManager.onready(function() {
